@@ -1,0 +1,37 @@
+export class ApiService {
+  private apiUrl = 'http://localhost:5000/api'; // Adjust the URL as needed
+
+  constructor(private http: HttpClient) {}
+
+  login(credentials: { username: string; password: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, credentials);
+  }
+
+  uploadFiles(formData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/upload`, formData);
+  }
+
+  getUploadRecords(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/uploads`);
+  }
+
+  getRejectionNotifications(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/notifications`);
+  }
+
+  submitSupplementaryDocuments(formData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/supplementary`, formData);
+  }
+
+  getCompanyRecords(filters: any): Observable<any> {
+    return this.http.get(`${this.apiUrl}/admin/records`, { params: filters });
+  }
+
+  markAsRejected(recordId: string, reason: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/admin/reject`, { recordId, reason });
+  }
+
+  exportRecordsToExcel(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/admin/export`, { responseType: 'blob' });
+  }
+}
