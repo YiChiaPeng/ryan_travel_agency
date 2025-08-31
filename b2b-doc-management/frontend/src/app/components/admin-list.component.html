@@ -1,0 +1,11 @@
+<div class="admin-list">
+  <h2>管理員後台 - 所有申請</h2>
+  <label>公司篩選 <input [(ngModel)]="companyFilter" /></label>
+  <label>日期篩選 <input type="date" [(ngModel)]="dateFilter" /></label>
+  <ul>
+    <li *ngFor="let u of uploads | slice:0:200">
+      {{ u.company }} | {{ u.date }} | {{ u.name }} | {{ u.type }} | {{ u.speed }} | {{ u.status }}
+      <button (click)="markReturned(u)">退件</button>
+    </li>
+  </ul>
+</div>

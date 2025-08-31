@@ -1,8 +1,18 @@
-Flask==2.1.1
-Flask-Cors==3.0.10
-Flask-SQLAlchemy==2.5.1
-Flask-Mail==0.9.1
-python-dotenv==0.19.2
-mysqlclient==2.0.3
-pandas==1.3.3
-Werkzeug==2.1.1
+fastapi==0.95.2
+uvicorn[standard]==0.23.2
+python-multipart==0.0.6
+Werkzeug==3.0.3
+
+# Database and ORM
+SQLAlchemy==1.4.48
+mysqlclient==2.2.4
+
+# Data handling
+pandas==2.2.2
+numpy==1.26.4
+
+# Utilities
+python-dotenv==1.0.1
+PyJWT==2.8.0
+
+

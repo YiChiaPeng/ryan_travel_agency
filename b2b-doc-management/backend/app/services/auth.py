@@ -1,28 +1,27 @@
-from flask import Blueprint, request, jsonify
+from fastapi import APIRouter, HTTPException
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.utils.db import get_db_connection
+from ..utils.db import get_db_connection
 
-auth_bp = Blueprint('auth', __name__)
+router = APIRouter(prefix="/auth")
 
-@auth_bp.route('/login', methods=['POST'])
-def login():
-    data = request.json
-    username = data.get('username')
-    password = data.get('password')
+
+@router.post('/login')
+def login(payload: dict):
+    username = payload.get('username')
+    password = payload.get('password')
 
     conn = get_db_connection()
     user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
 
     if user and check_password_hash(user['password'], password):
-        # Here you would typically create a session or token
-        return jsonify({'message': 'Login successful'}), 200
-    return jsonify({'message': 'Invalid username or password'}), 401
+        return {'message': 'Login successful'}
+    raise HTTPException(status_code=401, detail='Invalid username or password')
 
-@auth_bp.route('/register', methods=['POST'])
-def register():
-    data = request.json
-    username = data.get('username')
-    password = data.get('password')
+
+@router.post('/register')
+def register(payload: dict):
+    username = payload.get('username')
+    password = payload.get('password')
 
     hashed_password = generate_password_hash(password)
 
@@ -30,9 +29,9 @@ def register():
     conn.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, hashed_password))
     conn.commit()
 
-    return jsonify({'message': 'User registered successfully'}), 201
+    return {'message': 'User registered successfully'}
 
-@auth_bp.route('/logout', methods=['POST'])
+
+@router.post('/logout')
 def logout():
-    # Logic for logging out the user (e.g., clearing session or token)
-    return jsonify({'message': 'Logout successful'}), 200
+    return {'message': 'Logout successful'}

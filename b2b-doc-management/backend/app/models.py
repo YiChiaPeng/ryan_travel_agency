@@ -9,6 +9,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, index=True)
     password = Column(String(128))
+    is_admin = Column(Integer, default=0)
     company_name = Column(String(100))
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -26,5 +27,6 @@ class Document(Base):
     file_path = Column(Text)
     status = Column(String(20), default='pending')
     rejection_reason = Column(Text, nullable=True)
+    resubmission = Column(Text, nullable=True)
 
     owner = relationship("User", back_populates="documents")

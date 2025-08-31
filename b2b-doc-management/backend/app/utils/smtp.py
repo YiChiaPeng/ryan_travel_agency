@@ -33,8 +33,31 @@ def send_email(subject, body, to_email, attachments=None):
 
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
-            server.starttls()
-            server.login(from_email, from_password)
+            # Attempt to start TLS if the server supports it
+            try:
+                server.starttls()
+            except Exception:
+                pass
+
+            # Only attempt to login if credentials are provided
+            if from_email and from_password:
+                try:
+                    server.login(from_email, from_password)
+                except Exception as e:
+                    print(f"SMTP login failed: {e}")
+
             server.send_message(msg)
+        return True
     except Exception as e:
         print(f"Failed to send email: {e}")
+        return False
+
+
+def get_smtp_server():
+    """Backward-compatible helper that returns SMTP settings as a dict."""
+    return {
+        'host': os.getenv('SMTP_SERVER', 'smtp.example.com'),
+        'port': int(os.getenv('SMTP_PORT', 587)),
+        'sender_email': os.getenv('SMTP_USER'),
+        'password': os.getenv('SMTP_PASSWORD')
+    }

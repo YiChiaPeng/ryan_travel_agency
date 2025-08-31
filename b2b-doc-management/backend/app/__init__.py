@@ -1,5 +1,7 @@
-from flask import Flask
+"""Package initializer for backend.app
 
-app = Flask(__name__)
+This module intentionally does not create a Flask app. The project
+was migrated to FastAPI; the ASGI application lives in `app.main`.
+"""
 
-from . import routes  # Import routes to register them with the app
+__all__ = ["main", "routes", "models", "services", "utils"]

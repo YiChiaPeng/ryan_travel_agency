@@ -15,3 +15,13 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def get_db_connection():
+    """Return a raw DB-API connection from the SQLAlchemy engine for simple scripts.
+    The caller should call .cursor() and manage commits if needed.
+    """
+    return engine.raw_connection()
+
+def init_db():
+    """Initialize database schema from SQLAlchemy models (Base)."""
+    Base.metadata.create_all(bind=engine)
