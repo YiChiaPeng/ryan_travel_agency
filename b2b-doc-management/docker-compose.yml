@@ -5,8 +5,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4200:4200"
-    depends_on:
-      - backend
+    #depends_on:
+    #  - backend
+    volumes:
+      - ./frontend:/app
+      
 
   backend:
     build:

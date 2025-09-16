@@ -1,8 +1,0 @@
-<div class="b2b-list">
-  <h2>我的申請 - {{ company }}</h2>
-  <button (click)="newApplication()">新增申請</button>
-  <div *ngIf="uploads.length === 0">尚無申請</div>
-  <ul>
-    <li *ngFor="let u of uploads">{{ u.date }} - {{ u.name }} - {{ u.status || '待審核' }}</li>
-  </ul>
-</div>

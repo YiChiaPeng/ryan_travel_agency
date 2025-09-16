@@ -1,20 +1,22 @@
-# Use an official Node.js runtime as a parent image
-FROM node:18-alpine
+# Use official Node.js image for Angular
+FROM node:22-alpine
 
-# Set the working directory
+# 設定工作目錄
 WORKDIR /app
 
-# Install Angular CLI globally
+# 複製 package.json 及 package-lock.json
+COPY package.json ./
+# COPY package-lock.json ./
+
+# 安裝 npm 依賴
+RUN npm install
 RUN npm install -g @angular/cli
 
-# Create a new Angular app
-RUN ng new b2b-doc-management-frontend --directory . --routing --style css --skip-git --defaults
-
-# Copy the rest of the application's source code from the host to the image's filesystem.
+# 複製所有專案檔案
 COPY . .
 
-# Expose port 4200 to the outside world
+# 開放 4200 port
 EXPOSE 4200
 
-# Command to run the app
-CMD ["ng", "serve", "--host", "0.0.0.0"]
+# 啟動 Angular 開發伺服器
+CMD ["npm", "start"]
