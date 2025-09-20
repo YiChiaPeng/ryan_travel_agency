@@ -3,13 +3,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    ports:
-      - "4200:4200"
-    #depends_on:
-    #  - backend
+    
     volumes:
-      - ./frontend:/app
-      
+      - ./frontend/b2c-doc-management:/app  # 將容器內 /app 對應到本機 ./frontend/workspace
+
+    restart: always
 
   backend:
     build:
@@ -37,9 +35,6 @@ services:
       - "1025:1025" # SMTP
       - "8025:8025" # Web UI
 
-  
-
-  
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: always

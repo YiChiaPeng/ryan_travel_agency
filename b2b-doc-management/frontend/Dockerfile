@@ -1,22 +1,27 @@
-# Use official Node.js image for Angular
+# Use official Node image to run Angular dev server
 FROM node:22-alpine
 
-# 設定工作目錄
+# Install Git
+RUN apk add --no-cache git
+
+# Create app directory
 WORKDIR /app
-
-# 複製 package.json 及 package-lock.json
-COPY package.json ./
-# COPY package-lock.json ./
-
-# 安裝 npm 依賴
-RUN npm install
-RUN npm install -g @angular/cli
-
-# 複製所有專案檔案
+# Copy package files first to take advantage of Docker cache
 COPY . .
 
-# 開放 4200 port
+
+# Install Angular CLI globally so `ng` is available, then install deps for the app
+RUN npm install -g @angular/cli@latest
+
+
+
+# Configure Git user email and name
+RUN git config --global user.email "kent7493@icloud.com" && \
+    git config --global user.name "yichia"
+
+# Expose Angular dev server port
 EXPOSE 4200
 
-# 啟動 Angular 開發伺服器
-CMD ["npm", "start"]
+# Start dev server and listen on all interfaces so it is reachable from host
+CMD ["ng", "serve", "--host", "0.0.0.0"]
+

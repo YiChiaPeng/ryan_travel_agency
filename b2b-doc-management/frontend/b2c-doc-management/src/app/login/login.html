@@ -1,0 +1,94 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1 class="company-title">天星旅行社</h1>
+      <h2 class="system-title">B2B 文檔管理系統</h2>
+      <p class="login-subtitle">請登入您的帳戶</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- 用戶名輸入框 -->
+      <div class="form-group">
+        <label for="username" class="form-label">用戶名</label>
+        <div class="input-container">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input
+            type="text"
+            id="username"
+            formControlName="username"
+            class="form-input"
+            placeholder="請輸入用戶名"
+            [class.error]="getFieldError('username')"
+          >
+        </div>
+        <div class="error-message" *ngIf="getFieldError('username')">
+          {{ getFieldError('username') }}
+        </div>
+      </div>
+
+      <!-- 密碼輸入框 -->
+      <div class="form-group">
+        <label for="password" class="form-label">密碼</label>
+        <div class="input-container">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 15V17M6 21H18C19.1046 21 20 20.1046 20 19V13C20 11.8954 19.1046 11 18 11H6C4.89543 11 4 11.8954 4 13V19C4 20.1046 4.89543 21 6 21ZM16 11V7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7V11H16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            class="form-input"
+            placeholder="請輸入密碼"
+            [class.error]="getFieldError('password')"
+          >
+        </div>
+        <div class="error-message" *ngIf="getFieldError('password')">
+          {{ getFieldError('password') }}
+        </div>
+      </div>
+
+      <!-- 錯誤訊息 -->
+      <div class="error-message global-error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <!-- 登入按鈕 -->
+      <button
+        type="submit"
+        class="login-button"
+        [disabled]="isLoading"
+      >
+        <span *ngIf="!isLoading">登入</span>
+        <span *ngIf="isLoading" class="loading-spinner">
+          <svg class="spinner" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+              <animate attributeName="stroke-dashoffset" dur="1s" repeatCount="indefinite" values="31.416;0"/>
+            </circle>
+          </svg>
+          登入中...
+        </span>
+      </button>
+    </form>
+
+    <!-- 測試帳戶資訊 -->
+    <div class="test-account-info">
+      <p class="test-info-title">測試帳戶：</p>
+      <div class="account-list">
+        <div class="account-group">
+          <h4>審核者帳號</h4>
+          <p><strong>reviewer1</strong> - 張小明</p>
+          <p><strong>reviewer2</strong> - 李小華</p>
+        </div>
+        <div class="account-group">
+          <h4>一般使用者帳號</h4>
+          <p><strong>user1</strong> - 王小美</p>
+          <p><strong>user2</strong> - 陳小強</p>
+          <p><strong>user3</strong> - 林小雅</p>
+        </div>
+      </div>
+      <p class="password-note">所有帳號密碼都是：<strong>123456</strong></p>
+    </div>
+  </div>
+</div>

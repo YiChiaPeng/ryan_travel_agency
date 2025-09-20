@@ -1,0 +1,156 @@
+<div class="application-history-container">
+  <div class="history-header">
+    <h1 class="history-title">我的申請記錄</h1>
+    <button class="create-btn" (click)="createNewApplication()">
+      <svg class="create-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      新增申請
+    </button>
+  </div>
+
+  <!-- 篩選和搜尋 -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label class="filter-label">狀態篩選：</label>
+      <select [(ngModel)]="selectedStatus" (change)="onStatusChange()" class="status-select">
+        <option *ngFor="let option of statusOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <div class="search-group">
+      <div class="search-input-container">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 21L16.5 16.5M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+          placeholder="搜尋申請編號、顧客姓名或類別..."
+          class="search-input"
+        >
+      </div>
+    </div>
+  </div>
+
+  <!-- 統計資訊 -->
+  <div class="stats-section" *ngIf="applications.length > 0">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-info">
+        <h3>總申請數</h3>
+        <p class="stat-number">{{ applications.length }}</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-info">
+        <h3>處理中</h3>
+        <p class="stat-number">{{ pendingCount }}</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <h3>已完成</h3>
+        <p class="stat-number">{{ approvedCount }}</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">❌</div>
+      <div class="stat-info">
+        <h3>已拒絕</h3>
+        <p class="stat-number">{{ rejectedCount }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 申請列表 -->
+  <div class="applications-list" *ngIf="filteredApplications.length > 0; else noApplications">
+    <div class="application-card" *ngFor="let application of filteredApplications">
+      <div class="card-header">
+        <div class="application-id">{{ application.id }}</div>
+        <div class="application-status" [style.color]="getStatusColor(application.status)">
+          <span class="status-icon">{{ getStatusIcon(application.status) }}</span>
+          <span class="status-text">{{ getStatusLabel(application.status) }}</span>
+        </div>
+      </div>
+
+      <div class="card-content">
+        <div class="application-info">
+          <div class="info-row">
+            <span class="info-label">顧客姓名：</span>
+            <span class="info-value">{{ application.customerName }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">辦理類別：</span>
+            <span class="info-value">{{ application.type }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">辦理速度：</span>
+            <span class="info-value">{{ application.speed }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">申請日期：</span>
+            <span class="info-value">{{ application.applicationDate }}</span>
+          </div>
+          <div class="info-row" *ngIf="application.submitDate">
+            <span class="info-label">提交日期：</span>
+            <span class="info-value">{{ application.submitDate }}</span>
+          </div>
+        </div>
+
+        <div class="progress-section">
+          <div class="progress-label">處理進度</div>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="getApplicationProgress(application)"></div>
+          </div>
+          <div class="progress-text">{{ getApplicationProgress(application) }}%</div>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button
+          class="action-btn edit-btn"
+          (click)="editApplication(application)"
+          [disabled]="!canEditApplication(application)"
+        >
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          {{ application.status === 'rejected' ? '補件' : '編輯' }}
+        </button>
+
+        <button
+          class="action-btn delete-btn"
+          (click)="deleteApplication(application)"
+          [disabled]="!canDeleteApplication(application)"
+        >
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          刪除
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 無申請記錄 -->
+  <ng-template #noApplications>
+    <div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h3 class="empty-title">尚無申請記錄</h3>
+      <p class="empty-description">您還沒有任何申請記錄，點擊上方按鈕開始新增申請</p>
+      <button class="create-btn" (click)="createNewApplication()">
+        <svg class="create-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        新增第一個申請
+      </button>
+    </div>
+  </ng-template>
+</div>
