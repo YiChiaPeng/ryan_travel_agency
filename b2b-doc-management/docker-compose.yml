@@ -3,10 +3,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    
-    volumes:
-      - ./frontend/b2c-doc-management:/app  # 將容器內 /app 對應到本機 ./frontend/workspace
-
+    ports:
+      - "80:80"      # HTTP port
+      - "443:443"    # HTTPS port
     restart: always
 
   backend:
@@ -14,7 +13,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "5050:8000"    # 改為5000避免與其他服務衝突
     environment:
       DATABASE_URL: "mariadb://db_user:db_password@db:3306/b2b_doc"
       SMTP_SERVER: "smtp"
@@ -39,7 +38,7 @@ services:
     image: phpmyadmin/phpmyadmin
     restart: always
     ports:
-      - "8080:80"
+      - "8080:8080"    # 改回8080，避免與前端80端口衝突
     environment:
       PMA_HOST: db
       PMA_USER: root
@@ -54,6 +53,8 @@ services:
       MYSQL_DATABASE: b2b_doc
       MYSQL_USER: 
       MYSQL_PASSWORD: "00000000"
+    ports:
+      - "3307:3306"  # 改為3307避免與本機MySQL衝突
     volumes:
       - db_data:/var/lib/mysql
       - "./db/init.sql:/docker-entrypoint-initdb.d/init.sql"

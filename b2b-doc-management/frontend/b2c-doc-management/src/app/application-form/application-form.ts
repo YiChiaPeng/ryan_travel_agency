@@ -22,6 +22,7 @@ export class ApplicationForm implements OnInit {
   existingApplication: Application | null = null;
   isLoading = false;
   uploadProgress: { [key: string]: number } = {};
+  pendingAttachments: { type: string, files: File[] }[] = [];
 
   // 辦理類別選項
   applicationTypes: ApplicationType[] = ['首來族', '換證', '遺失件'];
@@ -118,8 +119,45 @@ export class ApplicationForm implements OnInit {
 
         this.applicationService.createApplication(newApplication).subscribe({
           next: (application) => {
-            this.isLoading = false;
-            this.router.navigate(['/dashboard']);
+            // 上傳待處理的附件
+            if (this.pendingAttachments.length > 0) {
+              let uploadCount = 0;
+              const totalUploads = this.pendingAttachments.reduce((sum, pa) => sum + pa.files.length, 0);
+
+              this.pendingAttachments.forEach(pa => {
+                pa.files.forEach(file => {
+                  const attachment: Omit<Attachment, 'id' | 'uploadDate'> = {
+                    name: file.name,
+                    type: pa.type as any,
+                    file: file,
+                    size: file.size
+                  };
+
+                  this.applicationService.uploadAttachment(application.id, attachment).subscribe({
+                    next: () => {
+                      uploadCount++;
+                      if (uploadCount === totalUploads) {
+                        this.isLoading = false;
+                        this.pendingAttachments = [];
+                        this.router.navigate(['/dashboard']);
+                      }
+                    },
+                    error: (error) => {
+                      console.error('Upload attachment error:', error);
+                      uploadCount++;
+                      if (uploadCount === totalUploads) {
+                        this.isLoading = false;
+                        this.pendingAttachments = [];
+                        this.router.navigate(['/dashboard']);
+                      }
+                    }
+                  });
+                });
+              });
+            } else {
+              this.isLoading = false;
+              this.router.navigate(['/dashboard']);
+            }
           },
           error: (error) => {
             console.error('Create application error:', error);
@@ -134,43 +172,86 @@ export class ApplicationForm implements OnInit {
 
   onFileSelected(event: any, attachmentType: string) {
     const files = event.target.files;
-    if (files && files.length > 0 && this.existingApplication) {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+    if (files && files.length > 0) {
+      if (this.isEditMode && this.existingApplication) {
+        // 編輯模式：立即上傳到現有申請
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
 
-        // 檢查檔案大小（限制 10MB）
-        if (file.size > 10 * 1024 * 1024) {
-          alert(`檔案 ${file.name} 太大，請選擇小於 10MB 的檔案`);
-          continue;
-        }
-
-        this.uploadProgress[file.name] = 0;
-
-        // 模擬上傳進度
-        const progressInterval = setInterval(() => {
-          this.uploadProgress[file.name] += 10;
-          if (this.uploadProgress[file.name] >= 100) {
-            clearInterval(progressInterval);
-
-            // 上傳完成
-            const attachment: Omit<Attachment, 'id' | 'uploadDate'> = {
-              name: file.name,
-              type: attachmentType as any,
-              file: file,
-              size: file.size
-            };
-
-            this.applicationService.uploadAttachment(this.existingApplication!.id, attachment).subscribe({
-              next: () => {
-                delete this.uploadProgress[file.name];
-              },
-              error: (error) => {
-                console.error('Upload attachment error:', error);
-                delete this.uploadProgress[file.name];
-              }
-            });
+          // 檢查檔案大小（限制 10MB）
+          if (file.size > 10 * 1024 * 1024) {
+            alert(`檔案 ${file.name} 太大，請選擇小於 10MB 的檔案`);
+            continue;
           }
-        }, 100);
+
+          this.uploadProgress[file.name] = 0;
+
+          // 模擬上傳進度
+          const progressInterval = setInterval(() => {
+            this.uploadProgress[file.name] += 10;
+            if (this.uploadProgress[file.name] >= 100) {
+              clearInterval(progressInterval);
+
+              // 上傳完成
+              const attachment: Omit<Attachment, 'id' | 'uploadDate'> = {
+                name: file.name,
+                type: attachmentType as any,
+                file: file,
+                size: file.size
+              };
+
+              this.applicationService.uploadAttachment(this.existingApplication!.id, attachment).subscribe({
+                next: () => {
+                  delete this.uploadProgress[file.name];
+                },
+                error: (error) => {
+                  console.error('Upload attachment error:', error);
+                  delete this.uploadProgress[file.name];
+                }
+              });
+            }
+          }, 100);
+        }
+      } else {
+        // 新建模式：添加到待上傳列表
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+
+          // 檢查檔案大小（限制 10MB）
+          if (file.size > 10 * 1024 * 1024) {
+            alert(`檔案 ${file.name} 太大，請選擇小於 10MB 的檔案`);
+            continue;
+          }
+
+          this.uploadProgress[file.name] = 0;
+
+          // 模擬上傳進度
+          const progressInterval = setInterval(() => {
+            this.uploadProgress[file.name] += 10;
+            if (this.uploadProgress[file.name] >= 100) {
+              clearInterval(progressInterval);
+
+              // 添加到待上傳列表
+              const existingType = this.pendingAttachments.find(pa => pa.type === attachmentType);
+              if (existingType) {
+                existingType.files.push(file);
+              } else {
+                this.pendingAttachments.push({ type: attachmentType, files: [file] });
+              }
+
+              delete this.uploadProgress[file.name];
+            }
+          }, 100);
+        }
+      }
+    }
+  }
+
+  removePendingAttachment(paIndex: number, fileIndex: number) {
+    if (this.pendingAttachments[paIndex]) {
+      this.pendingAttachments[paIndex].files.splice(fileIndex, 1);
+      if (this.pendingAttachments[paIndex].files.length === 0) {
+        this.pendingAttachments.splice(paIndex, 1);
       }
     }
   }

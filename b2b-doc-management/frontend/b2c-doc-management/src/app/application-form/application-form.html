@@ -63,8 +63,8 @@
       </div>
     </div>
 
-    <!-- 附件上傳 (只在編輯模式顯示) -->
-    <div class="form-section" *ngIf="isEditMode && existingApplication">
+    <!-- 附件上傳 -->
+    <div class="form-section">
       <h2 class="section-title">附件上傳</h2>
       <p class="section-description">請上傳相關文件，支援多檔案上傳，單檔案大小限制 10MB</p>
 
@@ -95,7 +95,7 @@
       </div>
 
       <!-- 已上傳的附件列表 -->
-      <div class="uploaded-attachments" *ngIf="existingApplication.attachments.length > 0">
+      <div class="uploaded-attachments" *ngIf="isEditMode && existingApplication && existingApplication.attachments.length > 0">
         <h3 class="attachments-title">已上傳的附件</h3>
         <div class="attachments-list">
           <div class="attachment-card" *ngFor="let attachment of existingApplication.attachments">
@@ -116,6 +116,32 @@
               </svg>
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- 待上傳的附件列表 -->
+      <div class="uploaded-attachments" *ngIf="!isEditMode && pendingAttachments.length > 0">
+        <h3 class="attachments-title">待上傳的附件</h3>
+        <div class="attachments-list">
+          <ng-container *ngFor="let pa of pendingAttachments; let paIndex = index">
+            <div class="attachment-card" *ngFor="let file of pa.files; let fileIndex = index">
+              <div class="attachment-info">
+                <div class="attachment-type">{{ pa.type }}</div>
+                <div class="attachment-name">{{ file.name }}</div>
+                <div class="attachment-size">{{ getFileSizeString(file.size) }}</div>
+              </div>
+              <button
+                type="button"
+                class="delete-btn"
+                (click)="removePendingAttachment(paIndex, fileIndex)"
+                title="刪除附件"
+              >
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </ng-container>
         </div>
       </div>
 
