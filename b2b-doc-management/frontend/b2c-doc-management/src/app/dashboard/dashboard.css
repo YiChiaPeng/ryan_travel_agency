@@ -49,6 +49,150 @@
   opacity: 0.7;
 }
 
+.user-actions {
+  position: relative;
+}
+
+/* 使用者選單樣式 */
+.user-menu {
+  position: relative;
+}
+
+.menu-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.menu-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.user-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.chevron-icon {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.3s ease;
+}
+
+.chevron-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  min-width: 280px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.user-info-dropdown {
+  flex: 1;
+}
+
+.user-name-dropdown {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 2px;
+}
+
+.user-role-dropdown {
+  font-size: 12px;
+  color: #718096;
+  background: #f8fafc;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 8px 0;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  color: #4a5568;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+  background: #f8fafc;
+  color: #2d3748;
+}
+
+.dropdown-item.logout-item:hover {
+  background: #fed7d7;
+  color: #e53e3e;
+}
+
+.dropdown-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* 舊的登出按鈕樣式（保留作為備用） */
 .logout-btn {
   background: rgba(255, 255, 255, 0.2);
   color: white;
@@ -446,6 +590,23 @@
     flex-direction: column;
     gap: 16px;
     text-align: center;
+  }
+
+  .user-info {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .user-details {
+    align-items: center;
+  }
+
+  .dropdown-menu {
+    right: 0;
+    left: 0;
+    min-width: auto;
+    margin: 0 16px;
   }
 
   .dashboard-main {

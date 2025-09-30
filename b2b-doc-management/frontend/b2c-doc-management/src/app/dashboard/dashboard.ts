@@ -21,6 +21,9 @@ export class Dashboard implements OnInit {
   pendingCount: number = 0;
   reviewedCount: number = 0;
   totalApplications: number = 0;
+  
+  // 使用者選單狀態
+  isUserMenuOpen = false;
 
   ngOnInit() {
     // 檢查登入狀態
@@ -36,9 +39,17 @@ export class Dashboard implements OnInit {
   private loadData() {
     if (this.currentUser?.role === 'reviewer') {
       // 審核員：載入所有審核記錄
-      this.reviewRecords = this.auth.getReviewRecords();
-      this.pendingCount = this.auth.getPendingRecordsCount();
-      this.reviewedCount = this.auth.getReviewedRecordsCount();
+      this.auth.getReviewRecords().subscribe(records => {
+        this.reviewRecords = records;
+      });
+      
+      this.auth.getPendingRecordsCount().subscribe(count => {
+        this.pendingCount = count;
+      });
+      
+      this.auth.getReviewedRecordsCount().subscribe(count => {
+        this.reviewedCount = count;
+      });
     } else {
       // 普通用戶：載入自己的申請記錄
       this.applications = this.applicationService.getUserApplications(this.currentUser?.username || '');
@@ -107,5 +118,21 @@ export class Dashboard implements OnInit {
 
   getRoleText(role: string): string {
     return role === 'reviewer' ? '審核者' : '一般使用者';
+  }
+
+  // 使用者選單控制
+  toggleUserMenu() {
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+  }
+
+  // 導航到帳號設定
+  navigateToAccountSettings() {
+    this.isUserMenuOpen = false;
+    this.router.navigate(['/account-settings']);
+  }
+
+  // 點擊外部關閉選單（可在 HTML 中使用）
+  closeUserMenu() {
+    this.isUserMenuOpen = false;
   }
 }

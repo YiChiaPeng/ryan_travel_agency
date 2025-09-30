@@ -1,0 +1,167 @@
+<div class="account-settings-container">
+  <div class="settings-header">
+    <button class="back-btn" (click)="goBack()">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      返回儀表板
+    </button>
+    <h1 class="settings-title">帳號設定</h1>
+    <div class="user-badge">
+      <span class="user-name">{{ currentUser?.name }}</span>
+      <span class="user-role">{{ currentUser?.role === 'reviewer' ? '審核者' : '一般使用者' }}</span>
+    </div>
+  </div>
+
+  <div class="settings-content">
+    <!-- 成功訊息 -->
+    <div class="alert alert-success" *ngIf="successMessage" (click)="clearMessages()">
+      <div class="alert-icon">✅</div>
+      <div class="alert-message">{{ successMessage }}</div>
+      <button class="alert-close">×</button>
+    </div>
+
+    <!-- 個人資料設定 -->
+    <div class="settings-section">
+      <div class="section-header">
+        <h2>個人資料</h2>
+        <p>更新您的個人資訊</p>
+      </div>
+      
+      <form class="settings-form" (ngSubmit)="updateProfile()">
+        <div class="form-group">
+          <label for="name">姓名</label>
+          <input 
+            type="text" 
+            id="name" 
+            [(ngModel)]="profileForm.name" 
+            name="name"
+            placeholder="請輸入您的姓名"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">電子郵件</label>
+          <input 
+            type="email" 
+            id="email" 
+            [(ngModel)]="profileForm.email" 
+            name="email"
+            placeholder="請輸入您的電子郵件"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="username">帳號名稱</label>
+          <input 
+            type="text" 
+            id="username" 
+            [value]="currentUser?.username" 
+            readonly
+            class="readonly-input">
+          <small class="form-help">帳號名稱無法修改</small>
+        </div>
+
+        <div class="alert alert-error" *ngIf="profileError">
+          <div class="alert-icon">❌</div>
+          <div class="alert-message">{{ profileError }}</div>
+        </div>
+
+        <button 
+          type="submit" 
+          class="submit-btn" 
+          [disabled]="isUpdatingProfile"
+          [class.loading]="isUpdatingProfile">
+          <span *ngIf="!isUpdatingProfile">更新個人資料</span>
+          <span *ngIf="isUpdatingProfile">
+            <div class="spinner"></div>
+            更新中...
+          </span>
+        </button>
+      </form>
+    </div>
+
+    <!-- 密碼修改 -->
+    <div class="settings-section">
+      <div class="section-header">
+        <h2>密碼設定</h2>
+        <p>修改您的登入密碼</p>
+      </div>
+      
+      <form class="settings-form" (ngSubmit)="changePassword()">
+        <div class="form-group">
+          <label for="currentPassword">目前密碼</label>
+          <input 
+            type="password" 
+            id="currentPassword" 
+            [(ngModel)]="passwordForm.currentPassword" 
+            name="currentPassword"
+            placeholder="請輸入目前密碼"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="newPassword">新密碼</label>
+          <input 
+            type="password" 
+            id="newPassword" 
+            [(ngModel)]="passwordForm.newPassword" 
+            name="newPassword"
+            placeholder="請輸入新密碼（至少6個字元）"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">確認新密碼</label>
+          <input 
+            type="password" 
+            id="confirmPassword" 
+            [(ngModel)]="passwordForm.confirmPassword" 
+            name="confirmPassword"
+            placeholder="請再次輸入新密碼"
+            required>
+        </div>
+
+        <div class="alert alert-error" *ngIf="passwordError">
+          <div class="alert-icon">❌</div>
+          <div class="alert-message">{{ passwordError }}</div>
+        </div>
+
+        <button 
+          type="submit" 
+          class="submit-btn" 
+          [disabled]="isChangingPassword"
+          [class.loading]="isChangingPassword">
+          <span *ngIf="!isChangingPassword">修改密碼</span>
+          <span *ngIf="isChangingPassword">
+            <div class="spinner"></div>
+            修改中...
+          </span>
+        </button>
+      </form>
+    </div>
+
+    <!-- 帳號資訊 -->
+    <div class="settings-section info-section">
+      <div class="section-header">
+        <h2>帳號資訊</h2>
+        <p>您的帳號基本資訊</p>
+      </div>
+      
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">帳號類型</div>
+          <div class="info-value">{{ currentUser?.role === 'reviewer' ? '審核者' : '一般使用者' }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">註冊公司</div>
+          <div class="info-value">{{ currentUser?.company || '未設定' }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">帳號狀態</div>
+          <div class="info-value status-active">啟用中</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

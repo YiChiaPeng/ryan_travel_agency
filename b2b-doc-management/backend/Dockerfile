@@ -17,10 +17,10 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy the application code as a package directory so `import app` works
-COPY app .
+COPY app ./app
 
 # Expose the port the app runs on (uvicorn)
 EXPOSE 8000
 
 # Default command to run the FastAPI app with uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

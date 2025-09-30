@@ -6,6 +6,8 @@ services:
     ports:
       - "80:80"      # HTTP port
       - "443:443"    # HTTPS port
+    depends_on:
+      - backend
     restart: always
 
   backend:
@@ -15,7 +17,7 @@ services:
     ports:
       - "5050:8000"    # 改為5000避免與其他服務衝突
     environment:
-      DATABASE_URL: "mariadb://db_user:db_password@db:3306/b2b_doc"
+      DATABASE_URL: "mariadb://backend:0225811247@db:3306/b2b_doc"
       SMTP_SERVER: "smtp"
       SMTP_PORT: "1025"
       SMTP_USER: ""
@@ -25,7 +27,7 @@ services:
       - smtp
     volumes:
       # Mount into the package directory so the container's /app entrypoint isn't overwritten
-      - ./backend/app:/app
+      - ./backend/app:/app/app
 
   smtp:
     image: "mailhog/mailhog"
@@ -38,21 +40,21 @@ services:
     image: phpmyadmin/phpmyadmin
     restart: always
     ports:
-      - "8080:8080"    # 改回8080，避免與前端80端口衝突
+      - "8080:80"    # phpMyAdmin 容器內部運行在 port 80
     environment:
       PMA_HOST: db
       PMA_USER: root
-      PMA_PASSWORD: "00000000"
+      PMA_PASSWORD: "84472643"
     depends_on:
       - db
   db:
     image: mariadb:latest
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: "00000000"
+      MYSQL_ROOT_PASSWORD: "84472643"
       MYSQL_DATABASE: b2b_doc
-      MYSQL_USER: 
-      MYSQL_PASSWORD: "00000000"
+      MYSQL_USER: "backend"
+      MYSQL_PASSWORD: "0225811247"
     ports:
       - "3307:3306"  # 改為3307避免與本機MySQL衝突
     volumes:
