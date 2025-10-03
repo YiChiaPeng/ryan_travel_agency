@@ -15,4 +15,11 @@ numpy==1.26.4
 python-dotenv==1.0.1
 PyJWT==2.8.0
 
+# OCR dependencies
+Pillow==10.4.0
+pytesseract==0.3.10
+
+# LLM dependencies  
+openai==1.40.6
+
 

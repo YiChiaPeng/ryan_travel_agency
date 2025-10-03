@@ -7,10 +7,17 @@ WORKDIR /app
 # Copy the requirements file
 COPY requirements.txt .
 
-# Install system dependencies needed for packages like mysqlclient
+# Install system dependencies including Tesseract OCR
 RUN apt-get update && \
-    apt-get install -y default-libmysqlclient-dev build-essential pkg-config && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y \
+    default-libmysqlclient-dev \
+    build-essential \
+    pkg-config \
+    tesseract-ocr \
+    tesseract-ocr-chi-tra \
+    tesseract-ocr-eng \
+    libtesseract-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Upgrade pip and install the application dependencies
 RUN pip install --no-cache-dir --upgrade pip && \

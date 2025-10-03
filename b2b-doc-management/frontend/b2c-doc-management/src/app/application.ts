@@ -10,6 +10,22 @@ export type ProcessingSpeed = '急件' | '普通件';
 // 申請狀態
 export type ApplicationStatus = 'draft' | 'submitted' | 'under_review' | 'approved' | 'rejected' | 'completed';
 
+// 個人資料介面
+export interface Individual {
+  id?: number;
+  chinese_last_name: string;
+  chinese_first_name: string;
+  english_last_name: string;
+  english_first_name: string;
+  national_id: string;
+  gender: '男' | '女';
+  passport_infomation_image?: string;
+  id_card_front_image?: string;
+  id_card_back_image?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 // 附件類型
 export interface Attachment {
   id: string;
@@ -31,6 +47,7 @@ export interface Application {
   customerName: string;
   status: ApplicationStatus;
   attachments: Attachment[];
+  individual?: Individual;  // 個人詳細資料
   submitDate?: string;
   reviewDate?: string;
   reviewerId?: string;

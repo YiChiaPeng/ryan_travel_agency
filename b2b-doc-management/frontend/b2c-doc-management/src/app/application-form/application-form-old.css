@@ -1,0 +1,1116 @@
+/* 申請表單樣式 */
+.application-form-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.form-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 8px 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.form-subtitle {
+  font-size: 16px;
+  color: #718096;
+  margin: 0;
+}
+
+.application-form {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.form-section {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 16px 0;
+}
+
+.section-description {
+  font-size: 14px;
+  color: #718096;
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+}
+
+.required {
+  color: #e53e3e;
+}
+
+.form-input,
+.form-select {
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #2d3748;
+  background: #ffffff;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.form-input:focus,
+.form-select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-input.error,
+.form-select.error {
+  border-color: #e53e3e;
+}
+
+.form-select {
+  cursor: pointer;
+}
+
+.error-message {
+  font-size: 12px;
+  color: #e53e3e;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.error-message::before {
+  content: '⚠';
+  font-size: 14px;
+}
+
+/* 附件上傳樣式 */
+.attachments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.attachment-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attachment-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.file-upload-area {
+  position: relative;
+}
+
+.file-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.file-upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #f7fafc;
+  border: 2px dashed #cbd5e0;
+  border-radius: 8px;
+  color: #718096;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+  width: 100%;
+}
+
+.file-upload-btn:hover {
+  background: #edf2f7;
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.upload-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* 已上傳附件樣式 */
+.uploaded-attachments {
+  margin-top: 32px;
+}
+
+.attachments-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 16px 0;
+}
+
+.attachments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.attachment-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.attachment-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.attachment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.attachment-type {
+  font-size: 12px;
+  font-weight: 600;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.attachment-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.attachment-size,
+.attachment-date {
+  font-size: 12px;
+  color: #718096;
+}
+
+.delete-btn {
+  background: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  background: #c53030;
+  transform: scale(1.05);
+}
+
+.delete-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 上傳進度樣式 */
+.upload-progress {
+  margin-top: 24px;
+  padding: 20px;
+  background: #f0fff4;
+  border: 1px solid #9ae6b4;
+  border-radius: 8px;
+}
+
+.progress-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 16px 0;
+}
+
+.progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.progress-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-name {
+  flex: 1;
+  font-size: 14px;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.progress-bar {
+  flex: 2;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: #667eea;
+  font-weight: 600;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* 表單按鈕樣式 */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.cancel-btn,
+.submit-btn {
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  outline: none;
+  min-width: 140px;
+}
+
+.cancel-btn {
+  background: #e2e8f0;
+  color: #4a5568;
+  border: 2px solid #e2e8f0;
+}
+
+.cancel-btn:hover {
+  background: #cbd5e0;
+  border-color: #cbd5e0;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: 2px solid transparent;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .application-form-container {
+    padding: 24px 16px;
+  }
+
+  .form-title {
+    font-size: 24px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .attachments-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .attachment-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .cancel-btn,
+  .submit-btn {
+    width: 100%;
+  }
+
+  /* 身分證上傳響應式 */
+  .id-card-upload-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .image-preview-area {
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-section {
+    padding: 16px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  .form-input,
+  .form-select {
+    padding: 10px 12px;
+  }
+
+  .id-card-upload-item {
+    margin-bottom: 16px;
+  }
+
+  .image-controls {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .zoom-control {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .crop-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* ===== 身分證上傳專用樣式 ===== */
+
+.id-card-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.id-card-upload-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.id-card-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+}
+
+.image-upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.image-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* 圖片上傳區域 */
+.image-upload-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  background: #f8fafc;
+  border: 3px dashed #cbd5e0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.image-upload-area:hover {
+  background: #edf2f7;
+  border-color: #667eea;
+  transform: scale(1.02);
+}
+
+.image-upload-area.drag-over {
+  background: rgba(102, 126, 234, 0.1);
+  border-color: #667eea;
+  border-style: solid;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  padding: 24px;
+}
+
+.upload-placeholder .upload-icon {
+  width: 48px;
+  height: 48px;
+  color: #a0aec0;
+  transition: color 0.3s ease;
+}
+
+.image-upload-area:hover .upload-placeholder .upload-icon {
+  color: #667eea;
+}
+
+.upload-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #4a5568;
+  margin: 0;
+}
+
+.upload-hint {
+  font-size: 14px;
+  color: #718096;
+  margin: 0;
+}
+
+/* 圖片預覽容器 */
+.image-preview-container {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.image-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.preview-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4a5568;
+}
+
+.action-btn:hover {
+  background: #f8fafc;
+  border-color: #667eea;
+  color: #667eea;
+  transform: scale(1.05);
+}
+
+.action-btn.delete {
+  color: #e53e3e;
+}
+
+.action-btn.delete:hover {
+  background: #fed7d7;
+  border-color: #e53e3e;
+  color: #c53030;
+}
+
+.action-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 圖片預覽區域 */
+.image-preview-area {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  background: #f1f3f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-preview-area.cropping {
+  cursor: crosshair;
+}
+
+.image-container {
+  position: relative;
+  transition: transform 0.3s ease;
+  transform-origin: center;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* 裁切覆蓋層 */
+.crop-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.crop-box {
+  position: absolute;
+  border: 2px solid #667eea;
+  background: transparent;
+  cursor: move;
+}
+
+.crop-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+/* 裁切控制點 */
+.crop-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #667eea;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.crop-handle-tl {
+  top: -6px;
+  left: -6px;
+  cursor: nw-resize;
+}
+
+.crop-handle-tr {
+  top: -6px;
+  right: -6px;
+  cursor: ne-resize;
+}
+
+.crop-handle-bl {
+  bottom: -6px;
+  left: -6px;
+  cursor: sw-resize;
+}
+
+.crop-handle-br {
+  bottom: -6px;
+  right: -6px;
+  cursor: se-resize;
+}
+
+/* 圖片控制項 */
+.image-controls {
+  padding: 16px 20px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.zoom-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.zoom-btn {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4a5568;
+}
+
+.zoom-btn:hover {
+  background: #f8fafc;
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.zoom-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.zoom-slider {
+  flex: 1;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+.zoom-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #667eea;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.zoom-slider::-webkit-slider-thumb:hover {
+  background: #5a67d8;
+  transform: scale(1.1);
+}
+
+.zoom-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #667eea;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.zoom-slider::-moz-range-thumb:hover {
+  background: #5a67d8;
+  transform: scale(1.1);
+}
+
+/* 裁切操作按鈕 */
+.crop-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.crop-action-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid;
+}
+
+.crop-action-btn.cancel {
+  background: #ffffff;
+  color: #718096;
+  border-color: #e2e8f0;
+}
+
+.crop-action-btn.cancel:hover {
+  background: #f8fafc;
+  color: #4a5568;
+  border-color: #cbd5e0;
+}
+
+.crop-action-btn.confirm {
+  background: #667eea;
+  color: #ffffff;
+  border-color: #667eea;
+}
+
+.crop-action-btn.confirm:hover {
+  background: #5a67d8;
+  border-color: #5a67d8;
+  transform: translateY(-1px);
+}
+
+/* ===== 二寸照片上傳專用樣式 ===== */
+
+.photo-upload-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.photo-upload-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 300px;
+  width: 100%;
+}
+
+.photo-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+  text-align: center;
+}
+
+/* 二寸照片預覽區域 */
+.image-preview-area.passport-photo {
+  aspect-ratio: 35/45; /* 2寸照片比例 */
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+/* 二寸照片裁切框 */
+.crop-box.passport-crop {
+  border: 3px solid #667eea;
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.crop-box.passport-crop::before {
+  content: '2寸照片';
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #667eea;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ===== 護照上傳專用樣式 ===== */
+
+.passport-upload-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.passport-upload-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.passport-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+  text-align: center;
+}
+
+/* 護照預覽區域 */
+.image-preview-area.passport-page {
+  aspect-ratio: 14/10; /* 護照頁面比例 */
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* ===== 通用圖片上傳響應式樣式 ===== */
+
+@media (max-width: 768px) {
+  /* 二寸照片響應式 */
+  .photo-upload-container {
+    margin: 0 -12px 24px;
+  }
+
+  .photo-upload-item {
+    max-width: none;
+    margin: 0 12px;
+  }
+
+  .image-preview-area.passport-photo {
+    max-width: 240px;
+  }
+
+  /* 護照響應式 */
+  .passport-upload-container {
+    margin: 0 -12px 24px;
+  }
+
+  .passport-upload-item {
+    max-width: none;
+    margin: 0 12px;
+  }
+
+  .image-preview-area.passport-page {
+    max-width: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 二寸照片小屏幕 */
+  .image-preview-area.passport-photo {
+    max-width: 200px;
+  }
+
+  .photo-label,
+  .passport-label {
+    font-size: 14px;
+  }
+
+  /* 護照小屏幕 */
+  .image-preview-area.passport-page {
+    max-width: 280px;
+  }
+
+  .crop-box.passport-crop::before {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}
+
+/* ===== 證件與照片兩欄布局樣式 ===== */
+
+.documents-upload-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 24px;
+}
+
+.passport-upload-column,
+.photo-upload-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.column-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 8px 0;
+  text-align: center;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+.column-description {
+  font-size: 14px;
+  color: #718096;
+  margin: 0 0 16px 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* 護照上傳專用 (左欄) */
+.passport-upload-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.passport-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+  text-align: center;
+}
+
+/* 二寸照片上傳專用 (右欄) */
+.photo-upload-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.photo-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+  text-align: center;
+}
+
+/* 護照預覽區域調整 */
+.passport-upload-column .image-preview-area.passport-page {
+  aspect-ratio: 14/10; /* 護照頁面比例 */
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* 二寸照片預覽區域調整 */
+.photo-upload-column .image-preview-area.passport-photo {
+  aspect-ratio: 35/45; /* 二寸照片比例 (35mm x 45mm) */
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+/* 響應式設計 - 平板 */
+@media (max-width: 768px) {
+  .documents-upload-row {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .column-title {
+    font-size: 16px;
+  }
+  
+  .passport-upload-column .image-preview-area.passport-page {
+    max-width: 350px;
+  }
+  
+  .photo-upload-column .image-preview-area.passport-photo {
+    max-width: 240px;
+  }
+}
+
+/* 響應式設計 - 手機 */
+@media (max-width: 480px) {
+  .documents-upload-row {
+    gap: 20px;
+  }
+  
+  .column-title {
+    font-size: 14px;
+  }
+  
+  .column-description {
+    font-size: 12px;
+  }
+  
+  .passport-label,
+  .photo-label {
+    font-size: 14px;
+  }
+  
+  .passport-upload-column .image-preview-area.passport-page {
+    max-width: 280px;
+  }
+  
+  .photo-upload-column .image-preview-area.passport-photo {
+    max-width: 200px;
+  }
+}
