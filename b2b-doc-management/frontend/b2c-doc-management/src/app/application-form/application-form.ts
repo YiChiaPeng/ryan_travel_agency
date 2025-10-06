@@ -90,7 +90,7 @@ export class ApplicationForm implements OnInit {
   };
 
   // 辦理類別選項
-  applicationTypes: ApplicationType[] = ['首來族', '換證', '遺失件'];
+  applicationTypes: ApplicationType[] = ['首次申請', '換證', '遺失件'];
 
   // 辦理速度選項
   processingSpeeds: ProcessingSpeed[] = ['急件', '普通件'];
@@ -120,6 +120,10 @@ export class ApplicationForm implements OnInit {
       englishFirstName: ['', [Validators.required, Validators.minLength(1)]],
       nationalId: ['', [Validators.required, Validators.pattern(/^[A-Z][12]\d{8}$/)]],
       gender: ['', Validators.required],
+      birthDate: ['', Validators.required],
+      address: ['', [Validators.required, Validators.minLength(5)]],
+      city: ['', Validators.required],
+      district: ['', Validators.required],
       // 圖片上傳
       idCardFront: ['', Validators.required],
       idCardBack: ['', Validators.required],

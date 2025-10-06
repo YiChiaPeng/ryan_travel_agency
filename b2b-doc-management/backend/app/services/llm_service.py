@@ -18,7 +18,11 @@ class LLMService:
             logger.warning("OPENAI_API_KEY 環境變數未設定，LLM功能將不可用")
             self.client = None
         else:
-            self.client = OpenAI(api_key=self.api_key)
+            try:
+                self.client = OpenAI(api_key=self.api_key)
+            except Exception as e:
+                logger.warning(f"OpenAI客戶端初始化失敗: {e}")
+                self.client = None
     
     def extract_passport_info(self, ocr_text: str) -> Optional[Dict[str, Any]]:
         """

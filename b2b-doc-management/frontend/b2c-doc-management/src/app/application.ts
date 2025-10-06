@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 // 申請類型
-export type ApplicationType = '首來族' | '換證' | '遺失件';
+export type ApplicationType = '首次申請' | '換證' | '遺失件';
 
 // 辦理速度
 export type ProcessingSpeed = '急件' | '普通件';
@@ -67,7 +67,7 @@ export class ApplicationService {
       id: 'APP001',
       applicantId: 'user1',
       applicantName: '王小美',
-      type: '首來族',
+      type: '首次申請',
       speed: '普通件',
       applicationDate: '2025-09-20',
       customerName: '張三',

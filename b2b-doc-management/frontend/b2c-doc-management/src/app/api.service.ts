@@ -43,7 +43,7 @@ export interface RegisterResponse {
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly baseUrl = environment.apiUrl || 'http://localhost:5050';
+  private readonly baseUrl = environment.apiUrl || '';
 
   constructor(private http: HttpClient) {}
 

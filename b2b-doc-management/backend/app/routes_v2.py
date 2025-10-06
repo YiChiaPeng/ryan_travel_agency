@@ -27,7 +27,7 @@ class IndividualRequest(BaseModel):
     id_card_back_image: Optional[str] = None   # Base64 編碼的圖片
 
 class ApplicationRequest(BaseModel):
-    application_type: str  # '首來族', '換證', '遺失件'
+    application_type: str  # '首次申請', '換證', '遺失件'
     urgency: str          # '急件', '普通件'
     application_date: Optional[str] = None
     customer_name: str

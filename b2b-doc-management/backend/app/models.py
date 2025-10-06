@@ -64,7 +64,7 @@ class Application(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     individual_id = Column(Integer, ForeignKey('individuals.id'), nullable=False)
-    application_type = Column(Enum('首來族', '換證', '遺失件'), nullable=False)
+    application_type = Column(Enum('首次申請', '換證', '遺失件'), nullable=False)
     urgency = Column(Enum('急件', '普通件'), nullable=False)
     application_date = Column(Date, nullable=False, default=date.today)
     customer_name = Column(String(255), nullable=False)
@@ -97,7 +97,7 @@ class Document(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey('users.id'))
-    document_type = Column(Enum('首來族', '換證', '遺失件'))
+    document_type = Column(Enum('首次申請', '換證', '遺失件'))
     urgency = Column(Enum('急件', '普通件'))
     application_date = Column(DateTime)
     customer_name = Column(String(255))
