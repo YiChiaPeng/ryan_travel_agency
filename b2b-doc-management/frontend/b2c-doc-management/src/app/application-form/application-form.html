@@ -5,602 +5,609 @@
   </div>
 
   <form [formGroup]="applicationForm" (ngSubmit)="onSubmit()" class="application-form">
-    
     <!-- 護照與二寸照片上傳 -->
     <div class="form-section">
-      <h2 class="section-title">證件與照片上傳</h2>
-      <p class="section-description">請上傳護照資料頁和二寸大頭照，所有圖片需清晰可見</p>
+      <div class="section-header" (click)="toggleSection('documentsUpload')">
+        <h2 class="section-title">證件與照片上傳</h2>
+        <svg class="toggle-icon" [class.rotated]="!sectionStates.documentsUpload" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="section-content" [class.collapsed]="!sectionStates.documentsUpload">
+        <p class="section-description">請上傳護照資料頁和二寸大頭照，所有圖片需清晰可見</p>
 
-      <div class="documents-upload-row">
-        <!-- 護照上傳 (左側) -->
-        <div class="passport-upload-column">
-          <h3 class="column-title">護照資料頁</h3>
-          <p class="column-description">請上傳護照資料頁（個人資料頁），需清晰可見所有文字和照片</p>
-          
-          <div class="passport-upload-item">
-            <label class="passport-label">護照正面 <span class="required">*</span></label>
-            <div class="image-upload-container">
-              <input
-                type="file"
-                id="passport-front"
-                (change)="onPassportImageSelected($event, 'front')"
-                accept="image/jpeg,image/jpg,image/png"
-                class="image-input"
-                #passportFrontInput
-              >
-              
-              <!-- 上傳區域 -->
-              <div class="image-upload-area" 
-                   *ngIf="!passportImages.front.preview"
-                   (click)="passportFrontInput.click()"
-                   (dragover)="onDragOver($event)"
-                   (dragleave)="onDragLeave($event)"
-                   (drop)="onPassportDrop($event, 'front')"> 
-                <div class="upload-placeholder">
-                  <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M9 9H9.01M15 9H15.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  <p class="upload-text">點擊或拖拽上傳護照正面</p>
-                  <p class="upload-hint">護照資料頁，支援 JPG、PNG 格式，最大 10MB</p>
-                </div>
-              </div>
+        <div class="documents-upload-row">
+          <!-- 護照上傳 (左側) -->
+          <div class="passport-upload-column">
+            <h3 class="column-title">護照資料頁</h3>
+            <p class="column-description">請上傳護照資料頁（個人資料頁），需清晰可見所有文字和照片</p>
 
-              <!-- 圖片預覽和編輯 -->
-              <div class="image-preview-container" *ngIf="passportImages.front.preview">
-                <div class="image-preview-header">
-                  <span class="preview-title">護照正面預覽</span>
-                  <div class="preview-actions">
-                    <button type="button" class="action-btn ocr-btn" (click)="extractPassportInfo('front')" title="提取資訊" [disabled]="isExtractingInfo">
-                      <svg *ngIf="!isExtractingInfo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9 12L11 14L15 10M3 7H21M3 17H21M3 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      <svg *ngIf="isExtractingInfo" class="spinner" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-                          <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-                          <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-                        </circle>
-                      </svg>
-                    </button>
-                    <button type="button" class="action-btn" (click)="rotatePassportImage('front')" title="旋轉">
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                    <button type="button" class="action-btn" (click)="cropPassportImage('front')" title="裁切">
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 2V6H2V8H6V14H14V8H20V6H14V2H12V6H8V2H6ZM8 8V12H12V8H8Z" fill="currentColor"/>
-                      </svg>
-                    </button>
-                    <button type="button" class="action-btn delete" (click)="removePassportImage('front')" title="刪除">
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
+            <div class="passport-upload-item">
+              <label class="passport-label">護照正面 <span class="required">*</span></label>
+              <div class="image-upload-container">
+                <input type="file" id="passport-front" (change)="onPassportImageSelected($event, 'front')"
+                  accept="image/jpeg,image/jpg,image/png" class="image-input" #passportFrontInput>
+
+                <!-- 上傳區域 -->
+                <div class="image-upload-area" *ngIf="!passportImages.front.preview"
+                  (click)="passportFrontInput.click()" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+                  (drop)="onPassportDrop($event, 'front')">
+                  <div class="upload-placeholder">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M9 9H9.01M15 9H15.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    </svg>
+                    <p class="upload-text">點擊或拖拽上傳護照正面</p>
+                    <p class="upload-hint">護照資料頁，支援 JPG、PNG 格式，最大 10MB</p>
                   </div>
                 </div>
-                
-                <div class="image-preview-area passport-page" [class.cropping]="passportImages.front.cropping">
-                  <div class="image-container" 
-                       [style.transform]="'rotate(' + passportImages.front.rotation + 'deg) scale(' + passportImages.front.scale + ')'">
-                    <img [src]="passportImages.front.preview" 
-                         alt="護照正面預覽"
-                         class="preview-image"
-                         (wheel)="onPassportImageWheel($event, 'front')"
-                         (mousedown)="onPassportImageMouseDown($event, 'front')"
-                         (mousemove)="onPassportImageMouseMove($event, 'front')"
-                         (mouseup)="onPassportImageMouseUp($event, 'front')"
-                         (mouseleave)="onPassportImageMouseUp($event, 'front')">
+
+                <!-- 圖片預覽和編輯 -->
+                <div class="image-preview-container" *ngIf="passportImages.front.preview">
+                  <div class="image-preview-header">
+                    <span class="preview-title">護照正面預覽</span>
+                    <div class="preview-actions">
+                      <button type="button" class="action-btn ocr-btn" (click)="extractPassportInfo('front')"
+                        title="提取資訊" [disabled]="isExtractingInfo">
+                        <svg *ngIf="!isExtractingInfo" viewBox="0 0 24 24" fill="none"
+                          xmlns="http://www.w3.org/2000/svg">
+                          <path d="M9 12L11 14L15 10M3 7H21M3 17H21M3 12H13" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <svg *ngIf="isExtractingInfo" class="spinner" viewBox="0 0 24 24" fill="none"
+                          xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+                            stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                            <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416"
+                              repeatCount="indefinite" />
+                            <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416"
+                              repeatCount="indefinite" />
+                          </circle>
+                        </svg>
+                      </button>
+                      <button type="button" class="action-btn" (click)="rotatePassportImage('front')" title="旋轉">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                          <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </button>
+                      <button type="button" class="action-btn" (click)="cropPassportImage('front')" title="裁切">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M6 2V6H2V8H6V14H14V8H20V6H14V2H12V6H8V2H6ZM8 8V12H12V8H8Z" fill="currentColor" />
+                        </svg>
+                      </button>
+                      <button type="button" class="action-btn delete" (click)="removePassportImage('front')" title="刪除">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                  
-                  <!-- 裁切框 -->
-                  <div class="crop-overlay" *ngIf="passportImages.front.cropping">
-                    <div class="crop-box" 
-                         [style.left.px]="passportImages.front.cropBox.x"
-                         [style.top.px]="passportImages.front.cropBox.y"
-                         [style.width.px]="passportImages.front.cropBox.width"
-                         [style.height.px]="passportImages.front.cropBox.height">
-                      <div class="crop-handle crop-handle-tl" (mousedown)="onPassportCropHandleMouseDown($event, 'front', 'tl')"></div>
-                      <div class="crop-handle crop-handle-tr" (mousedown)="onPassportCropHandleMouseDown($event, 'front', 'tr')"></div>
-                      <div class="crop-handle crop-handle-bl" (mousedown)="onPassportCropHandleMouseDown($event, 'front', 'bl')"></div>
-                      <div class="crop-handle crop-handle-br" (mousedown)="onPassportCropHandleMouseDown($event, 'front', 'br')"></div>
+
+                  <div class="image-preview-area passport-page" [class.cropping]="passportImages.front.cropping">
+                    <div class="image-container"
+                      [style.transform]="'rotate(' + passportImages.front.rotation + 'deg) scale(' + passportImages.front.scale + ')'">
+                      <img [src]="passportImages.front.preview" alt="護照正面預覽" class="preview-image"
+                        (wheel)="onPassportImageWheel($event, 'front')"
+                        (mousedown)="onPassportImageMouseDown($event, 'front')"
+                        (mousemove)="onPassportImageMouseMove($event, 'front')"
+                        (mouseup)="onPassportImageMouseUp($event, 'front')"
+                        (mouseleave)="onPassportImageMouseUp($event, 'front')">
+                    </div>
+
+                    <!-- 裁切框 -->
+                    <div class="crop-overlay" *ngIf="passportImages.front.cropping">
+                      <div class="crop-box" [style.left.px]="passportImages.front.cropBox.x"
+                        [style.top.px]="passportImages.front.cropBox.y"
+                        [style.width.px]="passportImages.front.cropBox.width"
+                        [style.height.px]="passportImages.front.cropBox.height">
+                        <div class="crop-handle crop-handle-tl"
+                          (mousedown)="onPassportCropHandleMouseDown($event, 'front', 'tl')"></div>
+                        <div class="crop-handle crop-handle-tr"
+                          (mousedown)="onPassportCropHandleMouseDown($event, 'front', 'tr')"></div>
+                        <div class="crop-handle crop-handle-bl"
+                          (mousedown)="onPassportCropHandleMouseDown($event, 'front', 'bl')"></div>
+                        <div class="crop-handle crop-handle-br"
+                          (mousedown)="onPassportCropHandleMouseDown($event, 'front', 'br')"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 縮放控制 -->
+                  <div class="image-controls">
+                    <div class="zoom-control">
+                      <button type="button" class="zoom-btn" (click)="zoomPassportImage('front', -0.1)">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                          <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                          <path d="M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                      </button>
+                      <input type="range" class="zoom-slider" min="0.5" max="3" step="0.1"
+                        [value]="passportImages.front.scale" (input)="onPassportZoomChange($event, 'front')">
+                      <button type="button" class="zoom-btn" (click)="zoomPassportImage('front', 0.1)">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                          <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                          <path d="M11 8V14M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <div class="crop-actions" *ngIf="passportImages.front.cropping">
+                      <button type="button" class="crop-action-btn cancel"
+                        (click)="cancelPassportCrop('front')">取消</button>
+                      <button type="button" class="crop-action-btn confirm"
+                        (click)="confirmPassportCrop('front')">確認裁切</button>
                     </div>
                   </div>
                 </div>
 
-                <!-- 縮放控制 -->
-                <div class="image-controls">
-                  <div class="zoom-control">
-                    <button type="button" class="zoom-btn" (click)="zoomPassportImage('front', -0.1)">
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
-                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                      </svg>
-                    </button>
-                    <input type="range" 
-                           class="zoom-slider"
-                           min="0.5" 
-                           max="3" 
-                           step="0.1" 
-                           [value]="passportImages.front.scale"
-                           (input)="onPassportZoomChange($event, 'front')">
-                    <button type="button" class="zoom-btn" (click)="zoomPassportImage('front', 0.1)">
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
-                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M11 8V14M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                      </svg>
-                    </button>
-                  </div>
-                  
-                  <div class="crop-actions" *ngIf="passportImages.front.cropping">
-                    <button type="button" class="crop-action-btn cancel" (click)="cancelPassportCrop('front')">取消</button>
-                    <button type="button" class="crop-action-btn confirm" (click)="confirmPassportCrop('front')">確認裁切</button>
-                  </div>
+                <div class="error-message" *ngIf="getFieldError('passportFront')">
+                  {{ getFieldError('passportFront') }}
                 </div>
-              </div>
-
-              <div class="error-message" *ngIf="getFieldError('passportFront')">
-                {{ getFieldError('passportFront') }}
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- 二寸照片上傳 (右側) -->
-        <div class="photo-upload-column">
-          <h3 class="column-title">二寸大頭照</h3>
-          <p class="column-description">請上傳二寸大頭照，建議尺寸 413x531 像素（35mm x 45mm），背景為白色或淺色</p>
-          
-          <div class="photo-upload-item">
-            <label class="photo-label">二寸照片 <span class="required">*</span></label>
-            <div class="image-upload-container">
-              <input
-                type="file"
-                id="passport-photo"
-                (change)="onPhotoImageSelected($event, 'passport')"
-                accept="image/jpeg,image/jpg,image/png"
-                class="image-input"
-                #passportPhotoInput
-              >
-              
-              <!-- 上傳區域 -->
-              <div class="image-upload-area" 
-                   *ngIf="!photoImages.passport.preview"
-                   (click)="passportPhotoInput.click()"
-                   (dragover)="onDragOver($event)"
-                   (dragleave)="onDragLeave($event)"
-                   (drop)="onPhotoDrop($event, 'passport')">
-                <div class="upload-placeholder">
-                  <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 21V19C20 16.7909 18.2091 15 16 15H8C5.79086 15 4 16.7909 4 19V21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  <p class="upload-text">點擊或拖拽上傳二寸照片</p>
-                  <p class="upload-hint">建議尺寸 413x531 像素，最大 10MB</p>
-                </div>
-              </div>
+          <!-- 二寸照片上傳 (右側) -->
+          <div class="photo-upload-column">
+            <h3 class="column-title">二寸大頭照</h3>
+            <p class="column-description">請上傳二寸大頭照，建議尺寸 413x531 像素（35mm x 45mm），背景為白色或淺色</p>
 
-              <!-- 圖片預覽和編輯 -->
-              <div class="image-preview-container" *ngIf="photoImages.passport.preview">
-                <div class="image-preview-header">
-                  <span class="preview-title">二寸照片預覽</span>
-                  <div class="preview-actions">
-                    <button type="button" class="action-btn" (click)="rotatePhotoImage('passport')" title="旋轉">
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
-                    <button type="button" class="action-btn" (click)="cropPhotoImage('passport')" title="裁切">
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 2V6H2V8H6V14H14V8H20V6H14V2H12V6H8V2H6ZM8 8V12H12V8H8Z" fill="currentColor"/>
-                      </svg>
-                    </button>
-                    <button type="button" class="action-btn delete" (click)="removePhotoImage('passport')" title="刪除">
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </button>
+            <div class="photo-upload-item">
+              <label class="photo-label">二寸照片 <span class="required">*</span></label>
+              <div class="image-upload-container">
+                <input type="file" id="passport-photo" (change)="onPhotoImageSelected($event, 'passport')"
+                  accept="image/jpeg,image/jpg,image/png" class="image-input" #passportPhotoInput>
+
+                <!-- 上傳區域 -->
+                <div class="image-upload-area" *ngIf="!photoImages.passport.preview"
+                  (click)="passportPhotoInput.click()" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+                  (drop)="onPhotoDrop($event, 'passport')">
+                  <div class="upload-placeholder">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M20 21V19C20 16.7909 18.2091 15 16 15H8C5.79086 15 4 16.7909 4 19V21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <p class="upload-text">點擊或拖拽上傳二寸照片</p>
+                    <p class="upload-hint">建議尺寸 413x531 像素，最大 10MB</p>
                   </div>
                 </div>
-                
-                <div class="image-preview-area passport-photo" [class.cropping]="photoImages.passport.cropping">
-                  <div class="image-container" 
-                       [style.transform]="'rotate(' + photoImages.passport.rotation + 'deg) scale(' + photoImages.passport.scale + ')'">
-                    <img [src]="photoImages.passport.preview" 
-                         alt="二寸照片預覽"
-                         class="preview-image"
-                         (wheel)="onPhotoImageWheel($event, 'passport')"
-                         (mousedown)="onPhotoImageMouseDown($event, 'passport')"
-                         (mousemove)="onPhotoImageMouseMove($event, 'passport')"
-                         (mouseup)="onPhotoImageMouseUp($event, 'passport')"
-                         (mouseleave)="onPhotoImageMouseUp($event, 'passport')">
+
+                <!-- 圖片預覽和編輯 -->
+                <div class="image-preview-container" *ngIf="photoImages.passport.preview">
+                  <div class="image-preview-header">
+                    <span class="preview-title">二寸照片預覽</span>
+                    <div class="preview-actions">
+                      <button type="button" class="action-btn" (click)="rotatePhotoImage('passport')" title="旋轉">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                          <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </button>
+                      <button type="button" class="action-btn" (click)="cropPhotoImage('passport')" title="裁切">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M6 2V6H2V8H6V14H14V8H20V6H14V2H12V6H8V2H6ZM8 8V12H12V8H8Z" fill="currentColor" />
+                        </svg>
+                      </button>
+                      <button type="button" class="action-btn delete" (click)="removePhotoImage('passport')" title="刪除">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                  
-                  <!-- 裁切框 -->
-                  <div class="crop-overlay" *ngIf="photoImages.passport.cropping">
-                    <div class="crop-box passport-crop" 
-                         [style.left.px]="photoImages.passport.cropBox.x"
-                         [style.top.px]="photoImages.passport.cropBox.y"
-                         [style.width.px]="photoImages.passport.cropBox.width"
-                         [style.height.px]="photoImages.passport.cropBox.height">
-                      <div class="crop-handle crop-handle-tl" (mousedown)="onPhotoCropHandleMouseDown($event, 'passport', 'tl')"></div>
-                      <div class="crop-handle crop-handle-tr" (mousedown)="onPhotoCropHandleMouseDown($event, 'passport', 'tr')"></div>
-                      <div class="crop-handle crop-handle-bl" (mousedown)="onPhotoCropHandleMouseDown($event, 'passport', 'bl')"></div>
-                      <div class="crop-handle crop-handle-br" (mousedown)="onPhotoCropHandleMouseDown($event, 'passport', 'br')"></div>
+
+                  <div class="image-preview-area passport-photo" [class.cropping]="photoImages.passport.cropping">
+                    <div class="image-container"
+                      [style.transform]="'rotate(' + photoImages.passport.rotation + 'deg) scale(' + photoImages.passport.scale + ')'">
+                      <img [src]="photoImages.passport.preview" alt="二寸照片預覽" class="preview-image"
+                        (wheel)="onPhotoImageWheel($event, 'passport')"
+                        (mousedown)="onPhotoImageMouseDown($event, 'passport')"
+                        (mousemove)="onPhotoImageMouseMove($event, 'passport')"
+                        (mouseup)="onPhotoImageMouseUp($event, 'passport')"
+                        (mouseleave)="onPhotoImageMouseUp($event, 'passport')">
+                    </div>
+
+                    <!-- 裁切框 -->
+                    <div class="crop-overlay" *ngIf="photoImages.passport.cropping">
+                      <div class="crop-box passport-crop" [style.left.px]="photoImages.passport.cropBox.x"
+                        [style.top.px]="photoImages.passport.cropBox.y"
+                        [style.width.px]="photoImages.passport.cropBox.width"
+                        [style.height.px]="photoImages.passport.cropBox.height">
+                        <div class="crop-handle crop-handle-tl"
+                          (mousedown)="onPhotoCropHandleMouseDown($event, 'passport', 'tl')"></div>
+                        <div class="crop-handle crop-handle-tr"
+                          (mousedown)="onPhotoCropHandleMouseDown($event, 'passport', 'tr')"></div>
+                        <div class="crop-handle crop-handle-bl"
+                          (mousedown)="onPhotoCropHandleMouseDown($event, 'passport', 'bl')"></div>
+                        <div class="crop-handle crop-handle-br"
+                          (mousedown)="onPhotoCropHandleMouseDown($event, 'passport', 'br')"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 縮放控制 -->
+                  <div class="image-controls">
+                    <div class="zoom-control">
+                      <button type="button" class="zoom-btn" (click)="zoomPhotoImage('passport', -0.1)">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                          <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                          <path d="M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                      </button>
+                      <input type="range" class="zoom-slider" min="0.5" max="3" step="0.1"
+                        [value]="photoImages.passport.scale" (input)="onPhotoZoomChange($event, 'passport')">
+                      <button type="button" class="zoom-btn" (click)="zoomPhotoImage('passport', 0.1)">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                          <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                          <path d="M11 8V14M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <div class="crop-actions" *ngIf="photoImages.passport.cropping">
+                      <button type="button" class="crop-action-btn cancel"
+                        (click)="cancelPhotoCrop('passport')">取消</button>
+                      <button type="button" class="crop-action-btn confirm"
+                        (click)="confirmPhotoCrop('passport')">確認裁切</button>
                     </div>
                   </div>
                 </div>
 
-                <!-- 縮放控制 -->
-                <div class="image-controls">
-                  <div class="zoom-control">
-                    <button type="button" class="zoom-btn" (click)="zoomPhotoImage('passport', -0.1)">
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
-                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                      </svg>
-                    </button>
-                    <input type="range" 
-                           class="zoom-slider"
-                           min="0.5" 
-                           max="3" 
-                           step="0.1" 
-                           [value]="photoImages.passport.scale"
-                           (input)="onPhotoZoomChange($event, 'passport')">
-                    <button type="button" class="zoom-btn" (click)="zoomPhotoImage('passport', 0.1)">
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
-                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M11 8V14M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                      </svg>
-                    </button>
-                  </div>
-                  
-                  <div class="crop-actions" *ngIf="photoImages.passport.cropping">
-                    <button type="button" class="crop-action-btn cancel" (click)="cancelPhotoCrop('passport')">取消</button>
-                    <button type="button" class="crop-action-btn confirm" (click)="confirmPhotoCrop('passport')">確認裁切</button>
-                  </div>
+                <div class="error-message" *ngIf="getFieldError('passportPhoto')">
+                  {{ getFieldError('passportPhoto') }}
                 </div>
-              </div>
-
-              <div class="error-message" *ngIf="getFieldError('passportPhoto')">
-                {{ getFieldError('passportPhoto') }}
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    
+
     <!-- 身分證上傳 -->
     <div class="form-section">
-      <h2 class="section-title">身分證上傳</h2>
-      <p class="section-description">請上傳身分證正面和反面照片，支援 JPG、PNG 格式，建議尺寸 1200x800 像素</p>
+      <div class="section-header" (click)="toggleSection('idCardUpload')">
+        <h2 class="section-title">身分證上傳</h2>
+        <svg class="toggle-icon" [class.rotated]="!sectionStates.idCardUpload" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="section-content" [class.collapsed]="!sectionStates.idCardUpload">
+        <p class="section-description">請上傳身分證正面和反面照片，支援 JPG、PNG 格式，建議尺寸 1200x800 像素</p>
 
-      <div class="id-card-upload-grid">
-        <!-- 身分證正面 -->
-        <div class="id-card-upload-item">
-          <label class="id-card-label">身分證正面 <span class="required">*</span></label>
-          <div class="image-upload-container">
-            <input
-              type="file"
-              id="id-card-front"
-              (change)="onIdCardImageSelected($event, 'front')"
-              accept="image/jpeg,image/jpg,image/png"
-              class="image-input"
-              #frontInput
-            >
-            
-            <!-- 上傳區域 -->
-            <div class="image-upload-area" 
-                 *ngIf="!idCardImages.front.preview"
-                 (click)="frontInput.click()"
-                 (dragover)="onDragOver($event)"
-                 (dragleave)="onDragLeave($event)"
-                 (drop)="onDrop($event, 'front')">
-              <div class="upload-placeholder">
-                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M14.2 3L4 13.2V20C4 20.5523 4.44772 21 5 21H11.8L22 10.8M14.2 3L19.8 8.6L22 10.8M14.2 3L10.8 6.4L19.8 8.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M8 12L12 8L16 12L12 16L8 12Z" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <p class="upload-text">點擊或拖拽上傳身分證正面</p>
-                <p class="upload-hint">支援 JPG、PNG 格式，最大 10MB</p>
-              </div>
-            </div>
+        <div class="id-card-upload-grid">
+          <!-- 身分證正面 -->
+          <div class="id-card-upload-item">
+            <label class="id-card-label">身分證正面 <span class="required">*</span></label>
+            <div class="image-upload-container">
+              <input type="file" id="id-card-front" (change)="onIdCardImageSelected($event, 'front')"
+                accept="image/jpeg,image/jpg,image/png" class="image-input" #frontInput>
 
-            <!-- 圖片預覽和編輯 -->
-            <div class="image-preview-container" *ngIf="idCardImages.front.preview">
-              <div class="image-preview-header">
-                <span class="preview-title">身分證正面預覽</span>
-                <div class="preview-actions">
-                  <button type="button" class="action-btn" (click)="rotateImage('front')" title="旋轉">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </button>
-                  <button type="button" class="action-btn" (click)="cropImage('front')" title="裁切">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M6 2V6H2V8H6V14H14V8H20V6H14V2H12V6H8V2H6ZM8 8V12H12V8H8Z" fill="currentColor"/>
-                    </svg>
-                  </button>
-                  <button type="button" class="action-btn delete" (click)="removeIdCardImage('front')" title="刪除">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </button>
+              <!-- 上傳區域 -->
+              <div class="image-upload-area" *ngIf="!idCardImages.front.preview" (click)="frontInput.click()"
+                (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event, 'front')">
+                <div class="upload-placeholder">
+                  <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M14.2 3L4 13.2V20C4 20.5523 4.44772 21 5 21H11.8L22 10.8M14.2 3L19.8 8.6L22 10.8M14.2 3L10.8 6.4L19.8 8.6"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M8 12L12 8L16 12L12 16L8 12Z" stroke="currentColor" stroke-width="1" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                  <p class="upload-text">點擊或拖拽上傳身分證正面</p>
+                  <p class="upload-hint">支援 JPG、PNG 格式，最大 10MB</p>
                 </div>
               </div>
-              
-              <div class="image-preview-area" [class.cropping]="idCardImages.front.cropping">
-                <div class="image-container" 
-                     [style.transform]="'rotate(' + idCardImages.front.rotation + 'deg) scale(' + idCardImages.front.scale + ')'">
-                  <img [src]="idCardImages.front.preview" 
-                       alt="身分證正面預覽"
-                       class="preview-image"
-                       (wheel)="onImageWheel($event, 'front')"
-                       (mousedown)="onImageMouseDown($event, 'front')"
-                       (mousemove)="onImageMouseMove($event, 'front')"
-                       (mouseup)="onImageMouseUp($event, 'front')"
-                       (mouseleave)="onImageMouseUp($event, 'front')">
+
+              <!-- 圖片預覽和編輯 -->
+              <div class="image-preview-container" *ngIf="idCardImages.front.preview">
+                <div class="image-preview-header">
+                  <span class="preview-title">身分證正面預覽</span>
+                  <div class="preview-actions">
+                    <button type="button" class="action-btn" (click)="rotateImage('front')" title="旋轉">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn" (click)="cropImage('front')" title="裁切">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 2V6H2V8H6V14H14V8H20V6H14V2H12V6H8V2H6ZM8 8V12H12V8H8Z" fill="currentColor" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn delete" (click)="removeIdCardImage('front')" title="刪除">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-                
-                <!-- 裁切框 -->
-                <div class="crop-overlay" *ngIf="idCardImages.front.cropping">
-                  <div class="crop-box" 
-                       [style.left.px]="idCardImages.front.cropBox.x"
-                       [style.top.px]="idCardImages.front.cropBox.y"
-                       [style.width.px]="idCardImages.front.cropBox.width"
-                       [style.height.px]="idCardImages.front.cropBox.height">
-                    <div class="crop-handle crop-handle-tl" (mousedown)="onCropHandleMouseDown($event, 'front', 'tl')"></div>
-                    <div class="crop-handle crop-handle-tr" (mousedown)="onCropHandleMouseDown($event, 'front', 'tr')"></div>
-                    <div class="crop-handle crop-handle-bl" (mousedown)="onCropHandleMouseDown($event, 'front', 'bl')"></div>
-                    <div class="crop-handle crop-handle-br" (mousedown)="onCropHandleMouseDown($event, 'front', 'br')"></div>
+
+                <div class="image-preview-area" [class.cropping]="idCardImages.front.cropping">
+                  <div class="image-container"
+                    [style.transform]="'rotate(' + idCardImages.front.rotation + 'deg) scale(' + idCardImages.front.scale + ')'">
+                    <img [src]="idCardImages.front.preview" alt="身分證正面預覽" class="preview-image"
+                      (wheel)="onImageWheel($event, 'front')" (mousedown)="onImageMouseDown($event, 'front')"
+                      (mousemove)="onImageMouseMove($event, 'front')" (mouseup)="onImageMouseUp($event, 'front')"
+                      (mouseleave)="onImageMouseUp($event, 'front')">
+                  </div>
+
+                  <!-- 裁切框 -->
+                  <div class="crop-overlay" *ngIf="idCardImages.front.cropping">
+                    <div class="crop-box" [style.left.px]="idCardImages.front.cropBox.x"
+                      [style.top.px]="idCardImages.front.cropBox.y" [style.width.px]="idCardImages.front.cropBox.width"
+                      [style.height.px]="idCardImages.front.cropBox.height">
+                      <div class="crop-handle crop-handle-tl"
+                        (mousedown)="onCropHandleMouseDown($event, 'front', 'tl')"></div>
+                      <div class="crop-handle crop-handle-tr"
+                        (mousedown)="onCropHandleMouseDown($event, 'front', 'tr')"></div>
+                      <div class="crop-handle crop-handle-bl"
+                        (mousedown)="onCropHandleMouseDown($event, 'front', 'bl')"></div>
+                      <div class="crop-handle crop-handle-br"
+                        (mousedown)="onCropHandleMouseDown($event, 'front', 'br')"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 縮放控制 -->
+                <div class="image-controls">
+                  <div class="zoom-control">
+                    <button type="button" class="zoom-btn" (click)="zoomImage('front', -0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                    <input type="range" class="zoom-slider" min="0.5" max="3" step="0.1"
+                      [value]="idCardImages.front.scale" (input)="onZoomChange($event, 'front')">
+                    <button type="button" class="zoom-btn" (click)="zoomImage('front', 0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M11 8V14M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="crop-actions" *ngIf="idCardImages.front.cropping">
+                    <button type="button" class="crop-action-btn cancel" (click)="cancelCrop('front')">取消</button>
+                    <button type="button" class="crop-action-btn confirm" (click)="confirmCrop('front')">確認裁切</button>
                   </div>
                 </div>
               </div>
 
-              <!-- 縮放控制 -->
-              <div class="image-controls">
-                <div class="zoom-control">
-                  <button type="button" class="zoom-btn" (click)="zoomImage('front', -0.1)">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
-                      <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                  </button>
-                  <input type="range" 
-                         class="zoom-slider"
-                         min="0.5" 
-                         max="3" 
-                         step="0.1" 
-                         [value]="idCardImages.front.scale"
-                         (input)="onZoomChange($event, 'front')">
-                  <button type="button" class="zoom-btn" (click)="zoomImage('front', 0.1)">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
-                      <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M11 8V14M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                  </button>
-                </div>
-                
-                <div class="crop-actions" *ngIf="idCardImages.front.cropping">
-                  <button type="button" class="crop-action-btn cancel" (click)="cancelCrop('front')">取消</button>
-                  <button type="button" class="crop-action-btn confirm" (click)="confirmCrop('front')">確認裁切</button>
-                </div>
+              <div class="error-message" *ngIf="getFieldError('idCardFront')">
+                {{ getFieldError('idCardFront') }}
               </div>
-            </div>
-
-            <div class="error-message" *ngIf="getFieldError('idCardFront')">
-              {{ getFieldError('idCardFront') }}
             </div>
           </div>
-        </div>
 
-        <!-- 身分證反面 -->
-        <div class="id-card-upload-item">
-          <label class="id-card-label">身分證反面 <span class="required">*</span></label>
-          <div class="image-upload-container">
-            <input
-              type="file"
-              id="id-card-back"
-              (change)="onIdCardImageSelected($event, 'back')"
-              accept="image/jpeg,image/jpg,image/png"
-              class="image-input"
-              #backInput
-            >
-            
-            <!-- 上傳區域 -->
-            <div class="image-upload-area" 
-                 *ngIf="!idCardImages.back.preview"
-                 (click)="backInput.click()"
-                 (dragover)="onDragOver($event)"
-                 (dragleave)="onDragLeave($event)"
-                 (drop)="onDrop($event, 'back')">
-              <div class="upload-placeholder">
-                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M14.2 3L4 13.2V20C4 20.5523 4.44772 21 5 21H11.8L22 10.8M14.2 3L19.8 8.6L22 10.8M14.2 3L10.8 6.4L19.8 8.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M8 12L12 8L16 12L12 16L8 12Z" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <p class="upload-text">點擊或拖拽上傳身分證反面</p>
-                <p class="upload-hint">支援 JPG、PNG 格式，最大 10MB</p>
-              </div>
-            </div>
+          <!-- 身分證反面 -->
+          <div class="id-card-upload-item">
+            <label class="id-card-label">身分證反面 <span class="required">*</span></label>
+            <div class="image-upload-container">
+              <input type="file" id="id-card-back" (change)="onIdCardImageSelected($event, 'back')"
+                accept="image/jpeg,image/jpg,image/png" class="image-input" #backInput>
 
-            <!-- 圖片預覽和編輯 -->
-            <div class="image-preview-container" *ngIf="idCardImages.back.preview">
-              <div class="image-preview-header">
-                <span class="preview-title">身分證反面預覽</span>
-                <div class="preview-actions">
-                  <button type="button" class="action-btn" (click)="rotateImage('back')" title="旋轉">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </button>
-                  <button type="button" class="action-btn" (click)="cropImage('back')" title="裁切">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M6 2V6H2V8H6V14H14V8H20V6H14V2H12V6H8V2H6ZM8 8V12H12V8H8Z" fill="currentColor"/>
-                    </svg>
-                  </button>
-                  <button type="button" class="action-btn delete" (click)="removeIdCardImage('back')" title="刪除">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </button>
+              <!-- 上傳區域 -->
+              <div class="image-upload-area" *ngIf="!idCardImages.back.preview" (click)="backInput.click()"
+                (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event, 'back')">
+                <div class="upload-placeholder">
+                  <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M14.2 3L4 13.2V20C4 20.5523 4.44772 21 5 21H11.8L22 10.8M14.2 3L19.8 8.6L22 10.8M14.2 3L10.8 6.4L19.8 8.6"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M8 12L12 8L16 12L12 16L8 12Z" stroke="currentColor" stroke-width="1" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                  <p class="upload-text">點擊或拖拽上傳身分證反面</p>
+                  <p class="upload-hint">支援 JPG、PNG 格式，最大 10MB</p>
                 </div>
               </div>
-              
-              <div class="image-preview-area" [class.cropping]="idCardImages.back.cropping">
-                <div class="image-container" 
-                     [style.transform]="'rotate(' + idCardImages.back.rotation + 'deg) scale(' + idCardImages.back.scale + ')'">
-                  <img [src]="idCardImages.back.preview" 
-                       alt="身分證反面預覽"
-                       class="preview-image"
-                       (wheel)="onImageWheel($event, 'back')"
-                       (mousedown)="onImageMouseDown($event, 'back')"
-                       (mousemove)="onImageMouseMove($event, 'back')"
-                       (mouseup)="onImageMouseUp($event, 'back')"
-                       (mouseleave)="onImageMouseUp($event, 'back')">
+
+              <!-- 圖片預覽和編輯 -->
+              <div class="image-preview-container" *ngIf="idCardImages.back.preview">
+                <div class="image-preview-header">
+                  <span class="preview-title">身分證反面預覽</span>
+                  <div class="preview-actions">
+                    <button type="button" class="action-btn" (click)="rotateImage('back')" title="旋轉">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn" (click)="cropImage('back')" title="裁切">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 2V6H2V8H6V14H14V8H20V6H14V2H12V6H8V2H6ZM8 8V12H12V8H8Z" fill="currentColor" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn delete" (click)="removeIdCardImage('back')" title="刪除">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-                
-                <!-- 裁切框 -->
-                <div class="crop-overlay" *ngIf="idCardImages.back.cropping">
-                  <div class="crop-box" 
-                       [style.left.px]="idCardImages.back.cropBox.x"
-                       [style.top.px]="idCardImages.back.cropBox.y"
-                       [style.width.px]="idCardImages.back.cropBox.width"
-                       [style.height.px]="idCardImages.back.cropBox.height">
-                    <div class="crop-handle crop-handle-tl" (mousedown)="onCropHandleMouseDown($event, 'back', 'tl')"></div>
-                    <div class="crop-handle crop-handle-tr" (mousedown)="onCropHandleMouseDown($event, 'back', 'tr')"></div>
-                    <div class="crop-handle crop-handle-bl" (mousedown)="onCropHandleMouseDown($event, 'back', 'bl')"></div>
-                    <div class="crop-handle crop-handle-br" (mousedown)="onCropHandleMouseDown($event, 'back', 'br')"></div>
+
+                <div class="image-preview-area" [class.cropping]="idCardImages.back.cropping">
+                  <div class="image-container"
+                    [style.transform]="'rotate(' + idCardImages.back.rotation + 'deg) scale(' + idCardImages.back.scale + ')'">
+                    <img [src]="idCardImages.back.preview" alt="身分證反面預覽" class="preview-image"
+                      (wheel)="onImageWheel($event, 'back')" (mousedown)="onImageMouseDown($event, 'back')"
+                      (mousemove)="onImageMouseMove($event, 'back')" (mouseup)="onImageMouseUp($event, 'back')"
+                      (mouseleave)="onImageMouseUp($event, 'back')">
+                  </div>
+
+                  <!-- 裁切框 -->
+                  <div class="crop-overlay" *ngIf="idCardImages.back.cropping">
+                    <div class="crop-box" [style.left.px]="idCardImages.back.cropBox.x"
+                      [style.top.px]="idCardImages.back.cropBox.y" [style.width.px]="idCardImages.back.cropBox.width"
+                      [style.height.px]="idCardImages.back.cropBox.height">
+                      <div class="crop-handle crop-handle-tl" (mousedown)="onCropHandleMouseDown($event, 'back', 'tl')">
+                      </div>
+                      <div class="crop-handle crop-handle-tr" (mousedown)="onCropHandleMouseDown($event, 'back', 'tr')">
+                      </div>
+                      <div class="crop-handle crop-handle-bl" (mousedown)="onCropHandleMouseDown($event, 'back', 'bl')">
+                      </div>
+                      <div class="crop-handle crop-handle-br" (mousedown)="onCropHandleMouseDown($event, 'back', 'br')">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 縮放控制 -->
+                <div class="image-controls">
+                  <div class="zoom-control">
+                    <button type="button" class="zoom-btn" (click)="zoomImage('back', -0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                    <input type="range" class="zoom-slider" min="0.5" max="3" step="0.1"
+                      [value]="idCardImages.back.scale" (input)="onZoomChange($event, 'back')">
+                    <button type="button" class="zoom-btn" (click)="zoomImage('back', 0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M11 8V14M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="crop-actions" *ngIf="idCardImages.back.cropping">
+                    <button type="button" class="crop-action-btn cancel" (click)="cancelCrop('back')">取消</button>
+                    <button type="button" class="crop-action-btn confirm" (click)="confirmCrop('back')">確認裁切</button>
                   </div>
                 </div>
               </div>
 
-              <!-- 縮放控制 -->
-              <div class="image-controls">
-                <div class="zoom-control">
-                  <button type="button" class="zoom-btn" (click)="zoomImage('back', -0.1)">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
-                      <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                  </button>
-                  <input type="range" 
-                         class="zoom-slider"
-                         min="0.5" 
-                         max="3" 
-                         step="0.1" 
-                         [value]="idCardImages.back.scale"
-                         (input)="onZoomChange($event, 'back')">
-                  <button type="button" class="zoom-btn" (click)="zoomImage('back', 0.1)">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
-                      <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M11 8V14M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                  </button>
-                </div>
-                
-                <div class="crop-actions" *ngIf="idCardImages.back.cropping">
-                  <button type="button" class="crop-action-btn cancel" (click)="cancelCrop('back')">取消</button>
-                  <button type="button" class="crop-action-btn confirm" (click)="confirmCrop('back')">確認裁切</button>
-                </div>
+              <div class="error-message" *ngIf="getFieldError('idCardBack')">
+                {{ getFieldError('idCardBack') }}
               </div>
-            </div>
-
-            <div class="error-message" *ngIf="getFieldError('idCardBack')">
-              {{ getFieldError('idCardBack') }}
             </div>
           </div>
         </div>
       </div>
     </div>
 
-   
+    
 
     <!-- 基本資訊 -->
     <div class="form-section">
-      <h2 class="section-title">基本資訊</h2>
+      <div class="section-header" (click)="toggleSection('basicInfo')">
+        <h2 class="section-title">基本資訊</h2>
+        <svg class="toggle-icon" [class.rotated]="!sectionStates.basicInfo" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="section-content" [class.collapsed]="!sectionStates.basicInfo">
 
-      <div class="form-row">
-        <!-- 辦理類別 -->
-        <div class="form-group">
-          <label class="form-label">辦理類別 <span class="required">*</span></label>
-          <select formControlName="type" class="form-select">
-            <option value="">請選擇辦理類別</option>
-            <option *ngFor="let type of applicationTypes" [value]="type">{{ type }}</option>
-          </select>
-          <div class="error-message" *ngIf="getFieldError('type')">
-            {{ getFieldError('type') }}
+        <div class="form-row">
+          <!-- 辦理類別 -->
+          <div class="form-group">
+            <label class="form-label">辦理類別 <span class="required">*</span></label>
+            <select formControlName="type" class="form-select" (change)="onApplicationTypeChange()">
+              <option value="">請選擇辦理類別</option>
+              <option *ngFor="let type of applicationTypes" [value]="type">{{ type }}</option>
+            </select>
+            <div class="error-message" *ngIf="getFieldError('type')">
+              {{ getFieldError('type') }}
+            </div>
+          </div>
+
+          <!-- 辦理速度 -->
+          <div class="form-group">
+            <label class="form-label">辦理速度 <span class="required">*</span></label>
+            <select formControlName="speed" class="form-select">
+              <option *ngFor="let speed of processingSpeeds" [value]="speed">{{ speed }}</option>
+            </select>
           </div>
         </div>
 
-        <!-- 辦理速度 -->
-        <div class="form-group">
-          <label class="form-label">辦理速度 <span class="required">*</span></label>
-          <select formControlName="speed" class="form-select">
-            <option *ngFor="let speed of processingSpeeds" [value]="speed">{{ speed }}</option>
-          </select>
+        <div class="form-row">
+          <!-- 辦理日期 -->
+          <div class="form-group">
+            <label class="form-label">辦理日期 <span class="required">*</span></label>
+            <input type="date" formControlName="applicationDate" class="form-input"
+              [class.error]="getFieldError('applicationDate')">
+            <div class="error-message" *ngIf="getFieldError('applicationDate')">
+              {{ getFieldError('applicationDate') }}
+            </div>
+          </div>
+
+          <!-- 顧客姓名 -->
+          <div class="form-group">
+            <label class="form-label">顧客姓名 <span class="required">*</span></label>
+            <input type="text" formControlName="customerName" class="form-input" placeholder="請輸入顧客姓名"
+              [class.error]="getFieldError('customerName')">
+            <div class="error-message" *ngIf="getFieldError('customerName')">
+              {{ getFieldError('customerName') }}
+            </div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <div class="form-row">
-        <!-- 辦理日期 -->
-        <div class="form-group">
-          <label class="form-label">辦理日期 <span class="required">*</span></label>
-          <input
-            type="date"
-            formControlName="applicationDate"
-            class="form-input"
-            [class.error]="getFieldError('applicationDate')"
-          >
-          <div class="error-message" *ngIf="getFieldError('applicationDate')">
-            {{ getFieldError('applicationDate') }}
-          </div>
-        </div>
-
-        <!-- 顧客姓名 -->
-        <div class="form-group">
-          <label class="form-label">顧客姓名 <span class="required">*</span></label>
-          <input
-            type="text"
-            formControlName="customerName"
-            class="form-input"
-            placeholder="請輸入顧客姓名"
-            [class.error]="getFieldError('customerName')"
-          >
-          <div class="error-message" *ngIf="getFieldError('customerName')">
-            {{ getFieldError('customerName') }}
-          </div>
-        </div>
-      </div>
-
-      <!-- 個人詳細資料 -->
-      <div class="form-section">
+    <!-- 個人詳細資料 -->
+    <div class="form-section">
+      <div class="section-header" (click)="toggleSection('personalDetails')">
         <h2 class="section-title">個人詳細資料</h2>
+        <svg class="toggle-icon" [class.rotated]="!sectionStates.personalDetails" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="section-content" [class.collapsed]="!sectionStates.personalDetails">
         <p class="section-description">請填寫完整的個人資料，用於辦理護照申請</p>
 
         <div class="form-row">
           <!-- 中文姓 -->
           <div class="form-group">
             <label class="form-label">中文姓 <span class="required">*</span></label>
-            <input
-              type="text"
-              formControlName="chineseLastName"
-              class="form-input"
-              placeholder="請輸入中文姓"
-              [class.error]="getFieldError('chineseLastName')"
-            >
+            <input type="text" formControlName="chineseLastName" class="form-input" placeholder="請輸入中文姓"
+              [class.error]="getFieldError('chineseLastName')">
             <div class="error-message" *ngIf="getFieldError('chineseLastName')">
               {{ getFieldError('chineseLastName') }}
             </div>
@@ -609,13 +616,8 @@
           <!-- 中文名 -->
           <div class="form-group">
             <label class="form-label">中文名 <span class="required">*</span></label>
-            <input
-              type="text"
-              formControlName="chineseFirstName"
-              class="form-input"
-              placeholder="請輸入中文名"
-              [class.error]="getFieldError('chineseFirstName')"
-            >
+            <input type="text" formControlName="chineseFirstName" class="form-input" placeholder="請輸入中文名"
+              [class.error]="getFieldError('chineseFirstName')">
             <div class="error-message" *ngIf="getFieldError('chineseFirstName')">
               {{ getFieldError('chineseFirstName') }}
             </div>
@@ -626,13 +628,8 @@
           <!-- 英文姓 -->
           <div class="form-group">
             <label class="form-label">英文姓 <span class="required">*</span></label>
-            <input
-              type="text"
-              formControlName="englishLastName"
-              class="form-input"
-              placeholder="請輸入英文姓 (Last Name)"
-              [class.error]="getFieldError('englishLastName')"
-            >
+            <input type="text" formControlName="englishLastName" class="form-input" placeholder="請輸入英文姓 (Last Name)"
+              [class.error]="getFieldError('englishLastName')">
             <div class="error-message" *ngIf="getFieldError('englishLastName')">
               {{ getFieldError('englishLastName') }}
             </div>
@@ -641,13 +638,8 @@
           <!-- 英文名 -->
           <div class="form-group">
             <label class="form-label">英文名 <span class="required">*</span></label>
-            <input
-              type="text"
-              formControlName="englishFirstName"
-              class="form-input"
-              placeholder="請輸入英文名 (First Name)"
-              [class.error]="getFieldError('englishFirstName')"
-            >
+            <input type="text" formControlName="englishFirstName" class="form-input" placeholder="請輸入英文名 (First Name)"
+              [class.error]="getFieldError('englishFirstName')">
             <div class="error-message" *ngIf="getFieldError('englishFirstName')">
               {{ getFieldError('englishFirstName') }}
             </div>
@@ -658,133 +650,709 @@
           <!-- 身分證字號 -->
           <div class="form-group">
             <label class="form-label">身分證字號 <span class="required">*</span></label>
-            <input
-              type="text"
-              formControlName="nationalId"
-              class="form-input"
-              placeholder="請輸入身分證字號"
-              maxlength="10"
-              [class.error]="getFieldError('nationalId')"
-            >
+            <input type="text" formControlName="nationalId" class="form-input" placeholder="請輸入身分證字號" maxlength="10"
+              [class.error]="getFieldError('nationalId')">
             <div class="error-message" *ngIf="getFieldError('nationalId')">
               {{ getFieldError('nationalId') }}
             </div>
           </div>
 
-          <!-- 性別 -->
+          <!-- 出生年月日 -->
           <div class="form-group">
-            <label class="form-label">性別 <span class="required">*</span></label>
-            <select formControlName="gender" class="form-select" [class.error]="getFieldError('gender')">
-              <option value="">請選擇性別</option>
-              <option value="男">男</option>
-              <option value="女">女</option>
+            <label class="form-label">出生年月日 <span class="required">*</span></label>
+            <input type="date" formControlName="birthDate" class="form-input" [class.error]="getFieldError('birthDate')"
+              max="{{ getTodayDate() }}" (change)="onBirthDateChange()">
+            <div class="error-message" *ngIf="getFieldError('birthDate')">
+              {{ getFieldError('birthDate') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <!-- 縣市選擇 -->
+          <div class="form-group">
+            <label class="form-label">縣市 <span class="required">*</span></label>
+            <select formControlName="city" class="form-select" [class.error]="getFieldError('city')"
+              (change)="onCityChange($event)">
+              <option value="">請選擇縣市</option>
+              <option *ngFor="let city of cities" [value]="city.name">
+                {{ city.name }}
+              </option>
             </select>
-            <div class="error-message" *ngIf="getFieldError('gender')">
-              {{ getFieldError('gender') }}
+            <div class="error-message" *ngIf="getFieldError('city')">
+              {{ getFieldError('city') }}
+            </div>
+          </div>
+
+          <!-- 區域選擇 -->
+          <div class="form-group">
+            <label class="form-label">區域 <span class="required">*</span></label>
+            <select formControlName="district" class="form-select" [class.error]="getFieldError('district')"
+              [disabled]="!applicationForm.get('city')?.value">
+              <option value="">請選擇區域</option>
+              <option *ngFor="let district of districts" [value]="district">
+                {{ district }}
+              </option>
+            </select>
+            <div class="error-message" *ngIf="getFieldError('district')">
+              {{ getFieldError('district') }}
             </div>
           </div>
         </div>
+
+        <div class="form-row">
+          <!-- 詳細地址 -->
+          <div class="form-group full-width">
+            <label class="form-label">詳細地址 <span class="required">*</span></label>
+            <input type="text" formControlName="address" class="form-input" placeholder="請輸入詳細地址（街道、巷弄、號碼等）"
+              [class.error]="getFieldError('address')">
+            <div class="error-message" *ngIf="getFieldError('address')">
+              {{ getFieldError('address') }}
+            </div>
+          </div>
+        </div>
+
+        
       </div>
     </div>
+    
 
-
-    <!-- 附件上傳 -->
-    <div class="form-section">
-      <h2 class="section-title">附件上傳</h2>
-      <p class="section-description">請上傳相關文件，支援多檔案上傳，單檔案大小限制 10MB</p>
-
-      <div class="attachments-grid">
-        <div class="attachment-item" *ngFor="let type of attachmentTypes">
-          <label class="attachment-label">{{ type }}</label>
-          <div class="file-upload-area">
-            <input
-              type="file"
-              [id]="'file-' + type"
-              multiple
-              (change)="onFileSelected($event, type)"
-              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-              class="file-input"
-            >
-            <label [for]="'file-' + type" class="file-upload-btn">
-              <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <polyline points="10,9 9,9 8,9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              選擇檔案
-            </label>
-          </div>
-        </div>
+    <!-- 監護人身分證上傳 (未滿16歲需要) -->
+    <div class="form-section" *ngIf="needsGuardian()">
+      <div class="section-header" (click)="toggleSection('guardianIdCardUpload')">
+        <h2 class="section-title">監護人身分證上傳</h2>
+        <svg class="toggle-icon" [class.rotated]="!sectionStates.guardianIdCardUpload" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
       </div>
+      <div class="section-content" [class.collapsed]="!sectionStates.guardianIdCardUpload">
+        <p class="section-description">申請人未滿16歲，請上傳監護人身分證正面和反面照片，支援 JPG、PNG 格式，建議尺寸 1200x800 像素</p>
 
-      <!-- 已上傳的附件列表 -->
-      <div class="uploaded-attachments" *ngIf="isEditMode && existingApplication && existingApplication.attachments.length > 0">
-        <h3 class="attachments-title">已上傳的附件</h3>
-        <div class="attachments-list">
-          <div class="attachment-card" *ngFor="let attachment of existingApplication.attachments">
-            <div class="attachment-info">
-              <div class="attachment-type">{{ attachment.type }}</div>
-              <div class="attachment-name">{{ attachment.name }}</div>
-              <div class="attachment-size">{{ getFileSizeString(attachment.size) }}</div>
-              <div class="attachment-date">{{ attachment.uploadDate | date:'yyyy-MM-dd HH:mm' }}</div>
-            </div>
-            <button
-              type="button"
-              class="delete-btn"
-              (click)="removeAttachment(attachment.id)"
-              title="刪除附件"
-            >
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+        <div class="id-card-upload-grid">
+          <!-- 監護人身分證正面 -->
+          <div class="id-card-upload-item">
+            <label class="id-card-label">監護人身分證正面 <span class="required">*</span></label>
+            <div class="image-upload-container">
+              <input type="file" id="guardian-id-card-front" (change)="onGuardianIdCardImageSelected($event, 'front')"
+                accept="image/jpeg,image/jpg,image/png" class="image-input" #guardianFrontInput>
 
-      <!-- 待上傳的附件列表 -->
-      <div class="uploaded-attachments" *ngIf="!isEditMode && pendingAttachments.length > 0">
-        <h3 class="attachments-title">待上傳的附件</h3>
-        <div class="attachments-list">
-          <ng-container *ngFor="let pa of pendingAttachments; let paIndex = index">
-            <div class="attachment-card" *ngFor="let file of pa.files; let fileIndex = index">
-              <div class="attachment-info">
-                <div class="attachment-type">{{ pa.type }}</div>
-                <div class="attachment-name">{{ file.name }}</div>
-                <div class="attachment-size">{{ getFileSizeString(file.size) }}</div>
+              <!-- 上傳區域 -->
+              <div class="image-upload-area" *ngIf="!guardianIdCardImages.front.preview" (click)="guardianFrontInput.click()"
+                (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onGuardianDrop($event, 'front')">
+                <div class="upload-placeholder">
+                  <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M14.2 3L4 13.2V20C4 20.5523 4.44772 21 5 21H11.8L22 10.8M14.2 3L19.8 8.6L22 10.8M14.2 3L10.8 6.4L19.8 8.6"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M8 12L12 8L16 12L12 16L8 12Z" stroke="currentColor" stroke-width="1" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                  <p class="upload-text">點擊或拖拽上傳監護人身分證正面</p>
+                  <p class="upload-hint">支援 JPG、PNG 格式，最大 10MB</p>
+                </div>
               </div>
-              <button
-                type="button"
-                class="delete-btn"
-                (click)="removePendingAttachment(paIndex, fileIndex)"
-                title="刪除附件"
-              >
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
-            </div>
-          </ng-container>
-        </div>
-      </div>
 
-      <!-- 上傳進度 -->
-      <div class="upload-progress" *ngIf="hasUploadProgress()">
-        <h3 class="progress-title">上傳進度</h3>
-        <div class="progress-list">
-          <div class="progress-item" *ngFor="let fileName of getUploadProgressKeys()">
-            <span class="file-name">{{ fileName }}</span>
-            <div class="progress-bar">
-              <div class="progress-fill" [style.width.%]="uploadProgress[fileName]"></div>
+              <!-- 圖片預覽和編輯 -->
+              <div class="image-preview-container" *ngIf="guardianIdCardImages.front.preview">
+                <div class="image-preview-header">
+                  <span class="preview-title">監護人身分證正面預覽</span>
+                  <div class="preview-actions">
+                    <button type="button" class="action-btn" (click)="rotateGuardianImage('front')" title="旋轉">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn" (click)="cropGuardianImage('front')" title="裁切">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 2V6H2V8H6V14H14V8H20V6H14V2H12V6H8V2H6ZM8 8V12H12V8H8Z" fill="currentColor" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn delete" (click)="removeGuardianIdCardImage('front')" title="刪除">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="image-preview-area" [class.cropping]="guardianIdCardImages.front.cropping">
+                  <div class="image-container"
+                    [style.transform]="'rotate(' + guardianIdCardImages.front.rotation + 'deg) scale(' + guardianIdCardImages.front.scale + ')'">
+                    <img [src]="guardianIdCardImages.front.preview" alt="監護人身分證正面預覽" class="preview-image"
+                      (wheel)="onGuardianImageWheel($event, 'front')" (mousedown)="onGuardianImageMouseDown($event, 'front')"
+                      (mousemove)="onGuardianImageMouseMove($event, 'front')" (mouseup)="onGuardianImageMouseUp($event, 'front')"
+                      (mouseleave)="onGuardianImageMouseUp($event, 'front')">
+                  </div>
+
+                  <!-- 裁切框 -->
+                  <div class="crop-overlay" *ngIf="guardianIdCardImages.front.cropping">
+                    <div class="crop-box" [style.left.px]="guardianIdCardImages.front.cropBox.x"
+                      [style.top.px]="guardianIdCardImages.front.cropBox.y" [style.width.px]="guardianIdCardImages.front.cropBox.width"
+                      [style.height.px]="guardianIdCardImages.front.cropBox.height">
+                      <div class="crop-handle crop-handle-tl"
+                        (mousedown)="onGuardianCropHandleMouseDown($event, 'front', 'tl')"></div>
+                      <div class="crop-handle crop-handle-tr"
+                        (mousedown)="onGuardianCropHandleMouseDown($event, 'front', 'tr')"></div>
+                      <div class="crop-handle crop-handle-bl"
+                        (mousedown)="onGuardianCropHandleMouseDown($event, 'front', 'bl')"></div>
+                      <div class="crop-handle crop-handle-br"
+                        (mousedown)="onGuardianCropHandleMouseDown($event, 'front', 'br')"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 縮放控制 -->
+                <div class="image-controls">
+                  <div class="zoom-control">
+                    <button type="button" class="zoom-btn" (click)="zoomGuardianImage('front', -0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                    <input type="range" class="zoom-slider" min="0.5" max="3" step="0.1"
+                      [value]="guardianIdCardImages.front.scale" (input)="onGuardianZoomChange($event, 'front')">
+                    <button type="button" class="zoom-btn" (click)="zoomGuardianImage('front', 0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M11 8V14M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="crop-actions" *ngIf="guardianIdCardImages.front.cropping">
+                    <button type="button" class="crop-action-btn cancel" (click)="cancelGuardianCrop('front')">取消</button>
+                    <button type="button" class="crop-action-btn confirm" (click)="confirmGuardianCrop('front')">確認裁切</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="error-message" *ngIf="getFieldError('guardianIdCardFront')">
+                {{ getFieldError('guardianIdCardFront') }}
+              </div>
             </div>
-            <span class="progress-text">{{ uploadProgress[fileName] }}%</span>
+          </div>
+
+          <!-- 監護人身分證反面 -->
+          <div class="id-card-upload-item">
+            <label class="id-card-label">監護人身分證反面 <span class="required">*</span></label>
+            <div class="image-upload-container">
+              <input type="file" id="guardian-id-card-back" (change)="onGuardianIdCardImageSelected($event, 'back')"
+                accept="image/jpeg,image/jpg,image/png" class="image-input" #guardianBackInput>
+
+              <!-- 上傳區域 -->
+              <div class="image-upload-area" *ngIf="!guardianIdCardImages.back.preview" (click)="guardianBackInput.click()"
+                (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onGuardianDrop($event, 'back')">
+                <div class="upload-placeholder">
+                  <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M14.2 3L4 13.2V20C4 20.5523 4.44772 21 5 21H11.8L22 10.8M14.2 3L19.8 8.6L22 10.8M14.2 3L10.8 6.4L19.8 8.6"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M8 12L12 8L16 12L12 16L8 12Z" stroke="currentColor" stroke-width="1" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                  <p class="upload-text">點擊或拖拽上傳監護人身分證反面</p>
+                  <p class="upload-hint">支援 JPG、PNG 格式，最大 10MB</p>
+                </div>
+              </div>
+
+              <!-- 圖片預覽和編輯 -->
+              <div class="image-preview-container" *ngIf="guardianIdCardImages.back.preview">
+                <div class="image-preview-header">
+                  <span class="preview-title">監護人身分證反面預覽</span>
+                  <div class="preview-actions">
+                    <button type="button" class="action-btn" (click)="rotateGuardianImage('back')" title="旋轉">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn" (click)="cropGuardianImage('back')" title="裁切">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 2V6H2V8H6V14H14V8H20V6H14V2H12V6H8V2H6ZM8 8V12H12V8H8Z" fill="currentColor" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn delete" (click)="removeGuardianIdCardImage('back')" title="刪除">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="image-preview-area" [class.cropping]="guardianIdCardImages.back.cropping">
+                  <div class="image-container"
+                    [style.transform]="'rotate(' + guardianIdCardImages.back.rotation + 'deg) scale(' + guardianIdCardImages.back.scale + ')'">
+                    <img [src]="guardianIdCardImages.back.preview" alt="監護人身分證反面預覽" class="preview-image"
+                      (wheel)="onGuardianImageWheel($event, 'back')" (mousedown)="onGuardianImageMouseDown($event, 'back')"
+                      (mousemove)="onGuardianImageMouseMove($event, 'back')" (mouseup)="onGuardianImageMouseUp($event, 'back')"
+                      (mouseleave)="onGuardianImageMouseUp($event, 'back')">
+                  </div>
+
+                  <!-- 裁切框 -->
+                  <div class="crop-overlay" *ngIf="guardianIdCardImages.back.cropping">
+                    <div class="crop-box" [style.left.px]="guardianIdCardImages.back.cropBox.x"
+                      [style.top.px]="guardianIdCardImages.back.cropBox.y" [style.width.px]="guardianIdCardImages.back.cropBox.width"
+                      [style.height.px]="guardianIdCardImages.back.cropBox.height">
+                      <div class="crop-handle crop-handle-tl" (mousedown)="onGuardianCropHandleMouseDown($event, 'back', 'tl')">
+                      </div>
+                      <div class="crop-handle crop-handle-tr" (mousedown)="onGuardianCropHandleMouseDown($event, 'back', 'tr')">
+                      </div>
+                      <div class="crop-handle crop-handle-bl" (mousedown)="onGuardianCropHandleMouseDown($event, 'back', 'bl')">
+                      </div>
+                      <div class="crop-handle crop-handle-br" (mousedown)="onGuardianCropHandleMouseDown($event, 'back', 'br')">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 縮放控制 -->
+                <div class="image-controls">
+                  <div class="zoom-control">
+                    <button type="button" class="zoom-btn" (click)="zoomGuardianImage('back', -0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                    <input type="range" class="zoom-slider" min="0.5" max="3" step="0.1"
+                      [value]="guardianIdCardImages.back.scale" (input)="onGuardianZoomChange($event, 'back')">
+                    <button type="button" class="zoom-btn" (click)="zoomGuardianImage('back', 0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M11 8V14M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="crop-actions" *ngIf="guardianIdCardImages.back.cropping">
+                    <button type="button" class="crop-action-btn cancel" (click)="cancelGuardianCrop('back')">取消</button>
+                    <button type="button" class="crop-action-btn confirm" (click)="confirmGuardianCrop('back')">確認裁切</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="error-message" *ngIf="getFieldError('guardianIdCardBack')">
+                {{ getFieldError('guardianIdCardBack') }}
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- 戶口謄本上傳 (近三個月改名需要) -->
+    <div class="form-section">
+      <div class="section-header" (click)="toggleSection('householdUpload')">
+        <h2 class="section-title">戶口謄本上傳</h2>
+        <svg class="toggle-icon" [class.rotated]="!sectionStates.householdUpload" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="section-content" [class.collapsed]="!sectionStates.householdUpload">
+        <p class="section-description">如果您在近三個月內有改過名字，請上傳戶口謄本，支援 JPG、PNG 格式，建議尺寸 1200x800 像素</p>
+
+        <div class="id-card-upload-grid">
+          <!-- 戶口謄本上傳 -->
+          <div class="id-card-upload-item">
+            <label class="id-card-label">戶口謄本</label>
+            <div class="image-upload-container">
+              <input type="file" id="household-record" (change)="onHouseholdImageSelected($event)"
+                accept="image/jpeg,image/jpg,image/png" class="image-input" #householdInput>
+
+              <!-- 上傳區域 -->
+              <div class="image-upload-area" *ngIf="!householdImages.household.preview" (click)="householdInput.click()"
+                (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onHouseholdDrop($event)">
+                <div class="upload-placeholder">
+                  <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M14.2 3L4 13.2V20C4 20.5523 4.44772 21 5 21H11.8L22 10.8M14.2 3L19.8 8.6L22 10.8M14.2 3L10.8 6.4L19.8 8.6"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M8 12L12 8L16 12L12 16L8 12Z" stroke="currentColor" stroke-width="1" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                  <p class="upload-text">點擊或拖拽上傳戶口謄本</p>
+                  <p class="upload-hint">近三個月改名者需要，支援 JPG、PNG 格式，最大 10MB</p>
+                </div>
+              </div>
+
+              <!-- 圖片預覽和編輯 -->
+              <div class="image-preview-container" *ngIf="householdImages.household.preview">
+                <div class="image-preview-header">
+                  <span class="preview-title">戶口謄本預覽</span>
+                  <div class="preview-actions">
+                    <button type="button" class="action-btn" (click)="rotateHouseholdImage()" title="旋轉">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn" (click)="cropHouseholdImage()" title="裁切">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 2V6H2V8H6V14H14V8H20V6H14V2H12V6H8V2H6ZM8 8V12H12V8H8Z" fill="currentColor" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn delete" (click)="removeHouseholdImage()" title="刪除">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="image-preview-area" [class.cropping]="householdImages.household.cropping">
+                  <div class="image-container"
+                    [style.transform]="'rotate(' + householdImages.household.rotation + 'deg) scale(' + householdImages.household.scale + ')'">
+                    <img [src]="householdImages.household.preview" alt="戶口謄本預覽" class="preview-image"
+                      (wheel)="onHouseholdImageWheel($event)" (mousedown)="onHouseholdImageMouseDown($event)"
+                      (mousemove)="onHouseholdImageMouseMove($event)" (mouseup)="onHouseholdImageMouseUp($event)"
+                      (mouseleave)="onHouseholdImageMouseUp($event)">
+                  </div>
+
+                  <!-- 裁切框 -->
+                  <div class="crop-overlay" *ngIf="householdImages.household.cropping">
+                    <div class="crop-box" [style.left.px]="householdImages.household.cropBox.x"
+                      [style.top.px]="householdImages.household.cropBox.y" [style.width.px]="householdImages.household.cropBox.width"
+                      [style.height.px]="householdImages.household.cropBox.height">
+                      <div class="crop-handle crop-handle-tl"
+                        (mousedown)="onHouseholdCropHandleMouseDown($event, 'tl')"></div>
+                      <div class="crop-handle crop-handle-tr"
+                        (mousedown)="onHouseholdCropHandleMouseDown($event, 'tr')"></div>
+                      <div class="crop-handle crop-handle-bl"
+                        (mousedown)="onHouseholdCropHandleMouseDown($event, 'bl')"></div>
+                      <div class="crop-handle crop-handle-br"
+                        (mousedown)="onHouseholdCropHandleMouseDown($event, 'br')"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 縮放控制 -->
+                <div class="image-controls">
+                  <div class="zoom-control">
+                    <button type="button" class="zoom-btn" (click)="zoomHouseholdImage(-0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                    <input type="range" class="zoom-slider" min="0.5" max="3" step="0.1"
+                      [value]="householdImages.household.scale" (input)="onHouseholdZoomChange($event)">
+                    <button type="button" class="zoom-btn" (click)="zoomHouseholdImage(0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M11 8V14M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="crop-actions" *ngIf="householdImages.household.cropping">
+                    <button type="button" class="crop-action-btn cancel" (click)="cancelHouseholdCrop()">取消</button>
+                    <button type="button" class="crop-action-btn confirm" (click)="confirmHouseholdCrop()">確認裁切</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="error-message" *ngIf="getFieldError('householdRecord')">
+                {{ getFieldError('householdRecord') }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    
+    <!-- 報案單上傳 (遺失件需要) -->
+    <div class="form-section" *ngIf="needsPoliceReport()">
+      <div class="section-header" (click)="toggleSection('policeReportUpload')">
+        <h2 class="section-title">報案單上傳</h2>
+        <svg class="toggle-icon" [class.rotated]="!sectionStates.policeReportUpload" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="section-content" [class.collapsed]="!sectionStates.policeReportUpload">
+        <p class="section-description">申請遺失件需要上傳報案單，請確保文件清晰可見，支援 JPG、PNG 格式，建議尺寸 1200x800 像素</p>
+
+        <div class="id-card-upload-grid">
+          <!-- 報案單上傳 -->
+          <div class="id-card-upload-item">
+            <label class="id-card-label">報案單 <span class="required">*</span></label>
+            <div class="image-upload-container">
+              <input type="file" id="police-report" (change)="onPoliceReportImageSelected($event)"
+                accept="image/jpeg,image/jpg,image/png" class="image-input" #policeReportInput>
+
+              <!-- 上傳區域 -->
+              <div class="image-upload-area" *ngIf="!policeReportImages.report.preview" (click)="policeReportInput.click()"
+                (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onPoliceReportDrop($event)">
+                <div class="upload-placeholder">
+                  <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M14.2 3L4 13.2V20C4 20.5523 4.44772 21 5 21H11.8L22 10.8M14.2 3L19.8 8.6L22 10.8M14.2 3L10.8 6.4L19.8 8.6"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M8 12L12 8L16 12L12 16L8 12Z" stroke="currentColor" stroke-width="1" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                  <p class="upload-text">點擊或拖拽上傳報案單</p>
+                  <p class="upload-hint">遺失件必要文件，支援 JPG、PNG 格式，最大 10MB</p>
+                </div>
+              </div>
+
+              <!-- 圖片預覽和編輯 -->
+              <div class="image-preview-container" *ngIf="policeReportImages.report.preview">
+                <div class="image-preview-header">
+                  <span class="preview-title">報案單預覽</span>
+                  <div class="preview-actions">
+                    <button type="button" class="action-btn" (click)="rotatePoliceReportImage()" title="旋轉">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn" (click)="cropPoliceReportImage()" title="裁切">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 2V6H2V8H6V14H14V8H20V6H14V2H12V6H8V2H6ZM8 8V12H12V8H8Z" fill="currentColor" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn delete" (click)="removePoliceReportImage()" title="刪除">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="image-preview-area" [class.cropping]="policeReportImages.report.cropping">
+                  <div class="image-container"
+                    [style.transform]="'rotate(' + policeReportImages.report.rotation + 'deg) scale(' + policeReportImages.report.scale + ')'">
+                    <img [src]="policeReportImages.report.preview" alt="報案單預覽" class="preview-image"
+                      (wheel)="onPoliceReportImageWheel($event)" (mousedown)="onPoliceReportImageMouseDown($event)"
+                      (mousemove)="onPoliceReportImageMouseMove($event)" (mouseup)="onPoliceReportImageMouseUp($event)"
+                      (mouseleave)="onPoliceReportImageMouseUp($event)">
+                  </div>
+
+                  <!-- 裁切框 -->
+                  <div class="crop-overlay" *ngIf="policeReportImages.report.cropping">
+                    <div class="crop-box" [style.left.px]="policeReportImages.report.cropBox.x"
+                      [style.top.px]="policeReportImages.report.cropBox.y" [style.width.px]="policeReportImages.report.cropBox.width"
+                      [style.height.px]="policeReportImages.report.cropBox.height">
+                      <div class="crop-handle crop-handle-tl"
+                        (mousedown)="onPoliceReportCropHandleMouseDown($event, 'tl')"></div>
+                      <div class="crop-handle crop-handle-tr"
+                        (mousedown)="onPoliceReportCropHandleMouseDown($event, 'tr')"></div>
+                      <div class="crop-handle crop-handle-bl"
+                        (mousedown)="onPoliceReportCropHandleMouseDown($event, 'bl')"></div>
+                      <div class="crop-handle crop-handle-br"
+                        (mousedown)="onPoliceReportCropHandleMouseDown($event, 'br')"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 縮放控制 -->
+                <div class="image-controls">
+                  <div class="zoom-control">
+                    <button type="button" class="zoom-btn" (click)="zoomPoliceReportImage(-0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                    <input type="range" class="zoom-slider" min="0.5" max="3" step="0.1"
+                      [value]="policeReportImages.report.scale" (input)="onPoliceReportZoomChange($event)">
+                    <button type="button" class="zoom-btn" (click)="zoomPoliceReportImage(0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M11 8V14M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="crop-actions" *ngIf="policeReportImages.report.cropping">
+                    <button type="button" class="crop-action-btn cancel" (click)="cancelPoliceReportCrop()">取消</button>
+                    <button type="button" class="crop-action-btn confirm" (click)="confirmPoliceReportCrop()">確認裁切</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="error-message" *ngIf="getFieldError('policeReport')">
+                {{ getFieldError('policeReport') }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 舊台胞證影本/切結書上傳 (換證需要) -->
+    <div class="form-section" *ngIf="needsOldPassportDocument()">
+      <div class="section-header" (click)="toggleSection('oldPassportUpload')">
+        <h2 class="section-title">舊台胞證影本/切結書上傳</h2>
+        <svg class="toggle-icon" [class.rotated]="!sectionStates.oldPassportUpload" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="section-content" [class.collapsed]="!sectionStates.oldPassportUpload">
+        <p class="section-description">申請換證需要上傳舊台胞證影本或切結書，請確保文件清晰可見，支援 JPG、PNG 格式，建議尺寸 1200x800 像素</p>
+
+        <div class="id-card-upload-grid">
+          <!-- 舊台胞證影本/切結書上傳 -->
+          <div class="id-card-upload-item">
+            <label class="id-card-label">舊台胞證影本/切結書 <span class="required">*</span></label>
+            <div class="image-upload-container">
+              <input type="file" id="old-passport-document" (change)="onOldPassportDocumentImageSelected($event)"
+                accept="image/jpeg,image/jpg,image/png" class="image-input" #oldPassportDocumentInput>
+
+              <!-- 上傳區域 -->
+              <div class="image-upload-area" *ngIf="!oldPassportImages.document.preview" (click)="oldPassportDocumentInput.click()"
+                (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onOldPassportDocumentDrop($event)">
+                <div class="upload-placeholder">
+                  <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M14.2 3L4 13.2V20C4 20.5523 4.44772 21 5 21H11.8L22 10.8M14.2 3L19.8 8.6L22 10.8M14.2 3L10.8 6.4L19.8 8.6"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M8 12L12 8L16 12L12 16L8 12Z" stroke="currentColor" stroke-width="1" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                  <p class="upload-text">點擊或拖拽上傳舊台胞證影本/切結書</p>
+                  <p class="upload-hint">換證必要文件，支援 JPG、PNG 格式，最大 10MB</p>
+                </div>
+              </div>
+
+              <!-- 圖片預覽和編輯 -->
+              <div class="image-preview-container" *ngIf="oldPassportImages.document.preview">
+                <div class="image-preview-header">
+                  <span class="preview-title">舊台胞證影本/切結書預覽</span>
+                  <div class="preview-actions">
+                    <button type="button" class="action-btn" (click)="rotateOldPassportDocumentImage()" title="旋轉">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn" (click)="cropOldPassportDocumentImage()" title="裁切">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 2V6H2V8H6V14H14V8H20V6H14V2H12V6H8V2H6ZM8 8V12H12V8H8Z" fill="currentColor" />
+                      </svg>
+                    </button>
+                    <button type="button" class="action-btn delete" (click)="removeOldPassportDocumentImage()" title="刪除">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M19 7L5 7M10 11V17M14 11V17M6 7V19C6 20.1046 6.89543 21 8 21H16C17.1046 21 18 20.1046 18 19V7M9 7V4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V7"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="image-preview-area" [class.cropping]="oldPassportImages.document.cropping">
+                  <div class="image-container"
+                    [style.transform]="'rotate(' + oldPassportImages.document.rotation + 'deg) scale(' + oldPassportImages.document.scale + ')'">
+                    <img [src]="oldPassportImages.document.preview" alt="舊台胞證影本/切結書預覽" class="preview-image"
+                      (wheel)="onOldPassportDocumentImageWheel($event)" (mousedown)="onOldPassportDocumentImageMouseDown($event)"
+                      (mousemove)="onOldPassportDocumentImageMouseMove($event)" (mouseup)="onOldPassportDocumentImageMouseUp($event)"
+                      (mouseleave)="onOldPassportDocumentImageMouseUp($event)">
+                  </div>
+
+                  <!-- 裁切框 -->
+                  <div class="crop-overlay" *ngIf="oldPassportImages.document.cropping">
+                    <div class="crop-box" [style.left.px]="oldPassportImages.document.cropBox.x"
+                      [style.top.px]="oldPassportImages.document.cropBox.y" [style.width.px]="oldPassportImages.document.cropBox.width"
+                      [style.height.px]="oldPassportImages.document.cropBox.height">
+                      <div class="crop-handle crop-handle-tl"
+                        (mousedown)="onOldPassportDocumentCropHandleMouseDown($event, 'tl')"></div>
+                      <div class="crop-handle crop-handle-tr"
+                        (mousedown)="onOldPassportDocumentCropHandleMouseDown($event, 'tr')"></div>
+                      <div class="crop-handle crop-handle-bl"
+                        (mousedown)="onOldPassportDocumentCropHandleMouseDown($event, 'bl')"></div>
+                      <div class="crop-handle crop-handle-br"
+                        (mousedown)="onOldPassportDocumentCropHandleMouseDown($event, 'br')"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 縮放控制 -->
+                <div class="image-controls">
+                  <div class="zoom-control">
+                    <button type="button" class="zoom-btn" (click)="zoomOldPassportDocumentImage(-0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                    <input type="range" class="zoom-slider" min="0.5" max="3" step="0.1"
+                      [value]="oldPassportImages.document.scale" (input)="onOldPassportDocumentZoomChange($event)">
+                    <button type="button" class="zoom-btn" (click)="zoomOldPassportDocumentImage(0.1)">
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                        <path d="M11 8V14M8 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="crop-actions" *ngIf="oldPassportImages.document.cropping">
+                    <button type="button" class="crop-action-btn cancel" (click)="cancelOldPassportDocumentCrop()">取消</button>
+                    <button type="button" class="crop-action-btn confirm" (click)="confirmOldPassportDocumentCrop()">確認裁切</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="error-message" *ngIf="getFieldError('oldPassportDocument')">
+                {{ getFieldError('oldPassportDocument') }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
     <!-- 表單按鈕 -->
     <div class="form-actions">
       <button type="button" class="cancel-btn" (click)="cancel()">取消</button>
@@ -792,8 +1360,9 @@
         <span *ngIf="!isLoading">{{ isEditMode ? '更新申請' : '提交申請' }}</span>
         <span *ngIf="isLoading" class="loading-text">
           <svg class="loading-spinner" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-              <animate attributeName="stroke-dashoffset" dur="1s" repeatCount="indefinite" values="31.416;0"/>
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="31.416"
+              stroke-dashoffset="31.416">
+              <animate attributeName="stroke-dashoffset" dur="1s" repeatCount="indefinite" values="31.416;0" />
             </circle>
           </svg>
           {{ isEditMode ? '更新中...' : '提交中...' }}

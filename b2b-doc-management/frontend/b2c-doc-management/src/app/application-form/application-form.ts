@@ -23,6 +23,8 @@ interface IdCardImage {
   isCropDragging?: boolean;
   cropDragStart?: { x: number; y: number };
   cropHandle?: string;
+  offsetX?: number;
+  offsetY?: number;
 }
 
 @Component({
@@ -45,6 +47,19 @@ export class ApplicationForm implements OnInit {
   uploadProgress: { [key: string]: number } = {};
   pendingAttachments: { type: string, files: File[] }[] = [];
 
+  // 區塊展開/收合狀態控制
+  sectionStates = {
+    documentsUpload: true,      // 證件與照片上傳
+    idCardUpload: true,         // 身分證上傳
+    guardianIdCardUpload: true, // 監護人身分證上傳
+    householdUpload: true,      // 戶口謄本上傳
+    policeReportUpload: true,   // 報案單上傳
+    oldPassportUpload: true,    // 舊台胞證影本/切結書上傳
+    basicInfo: true,            // 基本資訊
+    personalDetails: true,      // 個人詳細資料
+    attachments: true           // 附件上傳
+  };
+
   // 身分證圖片管理
   idCardImages: { front: IdCardImage, back: IdCardImage } = {
     front: {
@@ -56,6 +71,62 @@ export class ApplicationForm implements OnInit {
       cropBox: { x: 50, y: 50, width: 200, height: 120 }
     },
     back: {
+      preview: null,
+      file: null,
+      scale: 1,
+      rotation: 0,
+      cropping: false,
+      cropBox: { x: 50, y: 50, width: 200, height: 120 }
+    }
+  };
+
+  // 監護人身分證圖片管理
+  guardianIdCardImages: { front: IdCardImage, back: IdCardImage } = {
+    front: {
+      preview: null,
+      file: null,
+      scale: 1,
+      rotation: 0,
+      cropping: false,
+      cropBox: { x: 50, y: 50, width: 200, height: 120 }
+    },
+    back: {
+      preview: null,
+      file: null,
+      scale: 1,
+      rotation: 0,
+      cropping: false,
+      cropBox: { x: 50, y: 50, width: 200, height: 120 }
+    }
+  };
+
+  // 戶口謄本圖片管理
+  householdImages: { household: IdCardImage } = {
+    household: {
+      preview: null,
+      file: null,
+      scale: 1,
+      rotation: 0,
+      cropping: false,
+      cropBox: { x: 50, y: 50, width: 200, height: 120 }
+    }
+  };
+
+  // 報案單圖片管理
+  policeReportImages: { report: IdCardImage } = {
+    report: {
+      preview: null,
+      file: null,
+      scale: 1,
+      rotation: 0,
+      cropping: false,
+      cropBox: { x: 50, y: 50, width: 200, height: 120 }
+    }
+  };
+
+  // 舊台胞證影本/切結書圖片管理
+  oldPassportImages: { document: IdCardImage } = {
+    document: {
       preview: null,
       file: null,
       scale: 1,
@@ -107,6 +178,34 @@ export class ApplicationForm implements OnInit {
     '其他'
   ];
 
+  // 台灣縣市和區域資料
+  cities = [
+    { name: '台北市', districts: ['中正區', '大同區', '中山區', '松山區', '大安區', '萬華區', '信義區', '士林區', '北投區', '內湖區', '南港區', '文山區'] },
+    { name: '新北市', districts: ['板橋區', '三重區', '中和區', '永和區', '新莊區', '新店區', '樹林區', '鶯歌區', '三峽區', '淡水區', '汐止區', '瑞芳區', '土城區', '蘆洲區', '五股區', '泰山區', '林口區', '深坑區', '石碇區', '坪林區', '三芝區', '石門區', '八里區', '平溪區', '雙溪區', '貢寮區', '金山區', '萬里區', '烏來區'] },
+    { name: '桃園市', districts: ['桃園區', '中壢區', '大溪區', '楊梅區', '蘆竹區', '大園區', '龜山區', '八德區', '龍潭區', '平鎮區', '新屋區', '觀音區', '復興區'] },
+    { name: '台中市', districts: ['中區', '東區', '南區', '西區', '北區', '北屯區', '西屯區', '南屯區', '太平區', '大里區', '霧峰區', '烏日區', '豐原區', '后里區', '石岡區', '東勢區', '和平區', '新社區', '潭子區', '大雅區', '神岡區', '大肚區', '沙鹿區', '龍井區', '梧棲區', '清水區', '大甲區', '外埔區', '大安區'] },
+    { name: '台南市', districts: ['中西區', '東區', '南區', '北區', '安平區', '安南區', '永康區', '歸仁區', '新化區', '左鎮區', '玉井區', '楠西區', '南化區', '仁德區', '關廟區', '龍崎區', '官田區', '麻豆區', '佳里區', '西港區', '七股區', '將軍區', '學甲區', '北門區', '新營區', '後壁區', '白河區', '東山區', '六甲區', '下營區', '柳營區', '鹽水區', '善化區', '大內區', '山上區', '新市區', '安定區'] },
+    { name: '高雄市', districts: ['新興區', '前金區', '苓雅區', '鹽埕區', '鼓山區', '旗津區', '前鎮區', '三民區', '楠梓區', '小港區', '左營區', '仁武區', '大社區', '岡山區', '路竹區', '阿蓮區', '田寮區', '燕巢區', '橋頭區', '梓官區', '彌陀區', '永安區', '湖內區', '鳳山區', '大寮區', '林園區', '鳥松區', '大樹區', '旗山區', '美濃區', '六龜區', '內門區', '杉林區', '甲仙區', '桃源區', '那瑪夏區', '茂林區', '茄萣區'] },
+    { name: '基隆市', districts: ['仁愛區', '信義區', '中正區', '中山區', '安樂區', '暖暖區', '七堵區'] },
+    { name: '新竹市', districts: ['東區', '西區', '香山區'] },
+    { name: '嘉義市', districts: ['東區', '西區'] }
+  ];
+
+  // 當前選擇的縣市對應的區域列表
+  districts: string[] = [];
+
+  // 身分證正面圖片上傳進度
+  idCardFrontUploadProgress = 0;
+
+  // 身分證反面圖片上傳進度
+  idCardBackUploadProgress = 0;
+
+  // 二寸照片上傳進度
+  passportPhotoUploadProgress = 0;
+
+  // 護照正面上傳進度
+  passportFrontUploadProgress = 0;
+
   constructor() {
     this.applicationForm = this.fb.group({
       type: ['', Validators.required],
@@ -119,7 +218,6 @@ export class ApplicationForm implements OnInit {
       englishLastName: ['', [Validators.required, Validators.minLength(1)]],
       englishFirstName: ['', [Validators.required, Validators.minLength(1)]],
       nationalId: ['', [Validators.required, Validators.pattern(/^[A-Z][12]\d{8}$/)]],
-      gender: ['', Validators.required],
       birthDate: ['', Validators.required],
       address: ['', [Validators.required, Validators.minLength(5)]],
       city: ['', Validators.required],
@@ -128,7 +226,16 @@ export class ApplicationForm implements OnInit {
       idCardFront: ['', Validators.required],
       idCardBack: ['', Validators.required],
       passportPhoto: ['', Validators.required],
-      passportFront: ['', Validators.required]
+      passportFront: ['', Validators.required],
+      // 監護人身分證上傳（未滿16歲時必填）
+      guardianIdCardFront: [''],
+      guardianIdCardBack: [''],
+      // 戶口謄本上傳（近三個月改名時必填）
+      householdRecord: [''],
+      // 報案單上傳（遺失件時必填）
+      policeReport: [''],
+      // 舊台胞證影本/切結書上傳（換證時必填）
+      oldPassportDocument: ['']
     });
   }
 
@@ -142,8 +249,87 @@ export class ApplicationForm implements OnInit {
     }
   }
 
-  private getTodayDate(): string {
+  getTodayDate(): string {
     return new Date().toISOString().split('T')[0];
+  }
+
+  // 計算年齡
+  calculateAge(birthDate: string): number {
+    if (!birthDate) return 0;
+    
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    
+    return age;
+  }
+
+  // 檢查是否需要監護人（未滿16歲）
+  needsGuardian(): boolean {
+    const birthDate = this.applicationForm.get('birthDate')?.value;
+    if (!birthDate) return false;
+    
+    const age = this.calculateAge(birthDate);
+    return age < 16;
+  }
+
+  // 檢查是否需要報案單（遺失件）
+  needsPoliceReport(): boolean {
+    const applicationType = this.applicationForm.get('type')?.value;
+    return applicationType === '遺失件';
+  }
+
+  // 檢查是否需要舊台胞證影本/切結書（換證）
+  needsOldPassportDocument(): boolean {
+    const applicationType = this.applicationForm.get('type')?.value;
+    return applicationType === '換證';
+  }
+
+  // 監聽辦理類別變更，動態更新相關欄位驗證
+  onApplicationTypeChange(): void {
+    const policeReportControl = this.applicationForm.get('policeReport');
+    const oldPassportDocumentControl = this.applicationForm.get('oldPassportDocument');
+    
+    // 更新報案單驗證（遺失件）
+    if (this.needsPoliceReport()) {
+      policeReportControl?.setValidators([Validators.required]);
+    } else {
+      policeReportControl?.clearValidators();
+    }
+    
+    // 更新舊台胞證影本/切結書驗證（換證）
+    if (this.needsOldPassportDocument()) {
+      oldPassportDocumentControl?.setValidators([Validators.required]);
+    } else {
+      oldPassportDocumentControl?.clearValidators();
+    }
+    
+    policeReportControl?.updateValueAndValidity();
+    oldPassportDocumentControl?.updateValueAndValidity();
+  }
+
+  // 監聽生日變更，動態更新監護人欄位驗證
+  onBirthDateChange(): void {
+    const guardianFrontControl = this.applicationForm.get('guardianIdCardFront');
+    const guardianBackControl = this.applicationForm.get('guardianIdCardBack');
+    
+    if (this.needsGuardian()) {
+      // 未滿16歲，添加必填驗證
+      guardianFrontControl?.setValidators([Validators.required]);
+      guardianBackControl?.setValidators([Validators.required]);
+    } else {
+      // 滿16歲，移除驗證
+      guardianFrontControl?.clearValidators();
+      guardianBackControl?.clearValidators();
+    }
+    
+    guardianFrontControl?.updateValueAndValidity();
+    guardianBackControl?.updateValueAndValidity();
   }
 
   private populateForm() {
@@ -159,7 +345,7 @@ export class ApplicationForm implements OnInit {
         englishLastName: this.existingApplication.individual?.english_last_name || '',
         englishFirstName: this.existingApplication.individual?.english_first_name || '',
         nationalId: this.existingApplication.individual?.national_id || '',
-        gender: this.existingApplication.individual?.gender || ''
+        birthDate: this.existingApplication.individual?.birth_date || ''
       });
     }
   }
@@ -363,6 +549,11 @@ export class ApplicationForm implements OnInit {
     return (size / (1024 * 1024)).toFixed(1) + ' MB';
   }
 
+  // 切換區塊展開/收合狀態
+  toggleSection(section: keyof typeof this.sectionStates): void {
+    this.sectionStates[section] = !this.sectionStates[section];
+  }
+
   private markFormGroupTouched() {
     Object.keys(this.applicationForm.controls).forEach(key => {
       const control = this.applicationForm.get(key);
@@ -393,10 +584,24 @@ export class ApplicationForm implements OnInit {
       speed: '辦理速度',
       applicationDate: '辦理日期',
       customerName: '顧客姓名',
+      chineseLastName: '中文姓',
+      chineseFirstName: '中文名',
+      englishLastName: '英文姓',
+      englishFirstName: '英文名',
+      nationalId: '身分證字號',
+      birthDate: '出生年月日',
+      city: '縣市',
+      district: '區域',
+      address: '詳細地址',
       idCardFront: '身分證正面',
       idCardBack: '身分證反面',
       passportPhoto: '二寸照片',
-      passportFront: '護照正面'
+      passportFront: '護照正面',
+      guardianIdCardFront: '監護人身分證正面',
+      guardianIdCardBack: '監護人身分證反面',
+      householdRecord: '戶口謄本',
+      policeReport: '報案單',
+      oldPassportDocument: '舊台胞證影本/切結書'
     };
     return labels[fieldName] || fieldName;
   }
@@ -1257,11 +1462,943 @@ export class ApplicationForm implements OnInit {
     if (info.birthDate) {
       this.applicationForm.patchValue({ birthDate: info.birthDate });
     }
-    if (info.gender && (info.gender === '男' || info.gender === '女')) {
-      this.applicationForm.patchValue({ gender: info.gender });
-    }
     if (info.nationalId) {
       this.applicationForm.patchValue({ nationalId: info.nationalId });
     }
+  }
+
+  // 縣市選擇變更處理
+  onCityChange(event: any): void {
+    const selectedCityName = event.target.value;
+    const selectedCity = this.cities.find(city => city.name === selectedCityName);
+    
+    if (selectedCity) {
+      this.districts = selectedCity.districts;
+    } else {
+      this.districts = [];
+    }
+    
+    // 清除已選擇的區域
+    this.applicationForm.get('district')?.setValue('');
+  }
+
+  // === 監護人身分證圖片處理方法 ===
+  
+  onGuardianIdCardImageSelected(event: any, side: 'front' | 'back') {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // 檢查檔案類型
+    if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
+      alert('請選擇 JPG 或 PNG 格式的圖片檔案');
+      return;
+    }
+
+    // 檢查檔案大小（限制 10MB）
+    if (file.size > 10 * 1024 * 1024) {
+      alert('圖片檔案太大，請選擇小於 10MB 的檔案');
+      return;
+    }
+
+    // 讀取檔案並建立預覽
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.guardianIdCardImages[side] = {
+        preview: e.target?.result as string,
+        file: file,
+        scale: 1,
+        rotation: 0,
+        cropping: false,
+        cropBox: { x: 50, y: 50, width: 200, height: 120 }
+      };
+      
+      // 更新表單驗證狀態
+      this.applicationForm.get(`guardianIdCard${side.charAt(0).toUpperCase() + side.slice(1)}`)?.setValue(file.name);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // 監護人身分證拖拽處理
+  onGuardianDrop(event: DragEvent, side: 'front' | 'back') {
+    event.preventDefault();
+    event.stopPropagation();
+    (event.currentTarget as HTMLElement)?.classList.remove('drag-over');
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const mockEvent = { target: { files: [files[0]] } };
+      this.onGuardianIdCardImageSelected(mockEvent, side);
+    }
+  }
+
+  // 監護人身分證旋轉
+  rotateGuardianImage(side: 'front' | 'back') {
+    this.guardianIdCardImages[side].rotation = (this.guardianIdCardImages[side].rotation + 90) % 360;
+  }
+
+  // 監護人身分證縮放
+  zoomGuardianImage(side: 'front' | 'back', delta: number) {
+    const newScale = Math.max(0.5, Math.min(3, this.guardianIdCardImages[side].scale + delta));
+    this.guardianIdCardImages[side].scale = newScale;
+  }
+
+  onGuardianZoomChange(event: any, side: 'front' | 'back') {
+    this.guardianIdCardImages[side].scale = parseFloat(event.target.value);
+  }
+
+  // 監護人身分證圖片拖拽
+  onGuardianImageMouseDown(event: MouseEvent, side: 'front' | 'back') {
+    event.preventDefault();
+    
+    if (this.guardianIdCardImages[side].cropping) return;
+    
+    this.guardianIdCardImages[side].isDragging = true;
+    this.guardianIdCardImages[side].dragStart = { x: event.clientX, y: event.clientY };
+  }
+
+  onGuardianImageMouseMove(event: MouseEvent, side: 'front' | 'back') {
+    const image = this.guardianIdCardImages[side];
+    
+    if (image.isDragging && image.dragStart) {
+      const deltaX = event.clientX - image.dragStart.x;
+      const deltaY = event.clientY - image.dragStart.y;
+      
+      image.offsetX = (image.offsetX || 0) + deltaX;
+      image.offsetY = (image.offsetY || 0) + deltaY;
+      
+      image.dragStart = { x: event.clientX, y: event.clientY };
+    }
+    
+    if (image.isCropDragging && image.cropDragStart && image.cropHandle) {
+      const deltaX = event.clientX - image.cropDragStart.x;
+      const deltaY = event.clientY - image.cropDragStart.y;
+      
+      this.updateGuardianCropBox(side, image.cropHandle, deltaX, deltaY);
+      image.cropDragStart = { x: event.clientX, y: event.clientY };
+    }
+  }
+
+  onGuardianImageMouseUp(event: MouseEvent, side: 'front' | 'back') {
+    this.guardianIdCardImages[side].isDragging = false;
+    this.guardianIdCardImages[side].isCropDragging = false;
+    this.guardianIdCardImages[side].cropHandle = undefined;
+  }
+
+  // 監護人身分證裁切功能
+  cropGuardianImage(side: 'front' | 'back') {
+    this.guardianIdCardImages[side].cropping = true;
+    // 儲存原始預覽圖片
+    this.guardianIdCardImages[side].originalPreview = this.guardianIdCardImages[side].preview || undefined;
+  }
+
+  cancelGuardianCrop(side: 'front' | 'back') {
+    this.guardianIdCardImages[side].cropping = false;
+    if (this.guardianIdCardImages[side].originalPreview) {
+      this.guardianIdCardImages[side].preview = this.guardianIdCardImages[side].originalPreview;
+      this.guardianIdCardImages[side].originalPreview = undefined;
+    }
+  }
+
+  confirmGuardianCrop(side: 'front' | 'back') {
+    const image = this.guardianIdCardImages[side];
+    if (!image.preview) return;
+
+    // 建立 canvas 進行裁切
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const img = new Image();
+    img.onload = () => {
+      const cropBox = image.cropBox;
+      canvas.width = cropBox.width;
+      canvas.height = cropBox.height;
+
+      // 應用旋轉和縮放
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate((image.rotation * Math.PI) / 180);
+      ctx.scale(image.scale, image.scale);
+      
+      ctx.drawImage(
+        img,
+        cropBox.x - canvas.width / 2,
+        cropBox.y - canvas.height / 2,
+        cropBox.width,
+        cropBox.height,
+        -cropBox.width / 2,
+        -cropBox.height / 2,
+        cropBox.width,
+        cropBox.height
+      );
+      ctx.restore();
+
+      // 更新預覽圖片
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const croppedFile = new File([blob], image.file?.name || 'cropped-guardian-id.jpg', { type: 'image/jpeg' });
+          image.file = croppedFile;
+          image.preview = canvas.toDataURL();
+          image.cropping = false;
+          image.originalPreview = undefined;
+        }
+      }, 'image/jpeg', 0.9);
+    };
+    
+    img.src = image.originalPreview || image.preview;
+  }
+
+  // 監護人身分證裁切控制點拖拽
+  onGuardianCropHandleMouseDown(event: MouseEvent, side: 'front' | 'back', handle: string) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.guardianIdCardImages[side].isCropDragging = true;
+    this.guardianIdCardImages[side].cropDragStart = { x: event.clientX, y: event.clientY };
+    this.guardianIdCardImages[side].cropHandle = handle;
+  }
+
+  // 更新監護人身分證裁切框
+  private updateGuardianCropBox(side: 'front' | 'back', handle: string, deltaX: number, deltaY: number) {
+    const cropBox = this.guardianIdCardImages[side].cropBox;
+    
+    switch (handle) {
+      case 'tl':
+        cropBox.x += deltaX;
+        cropBox.y += deltaY;
+        cropBox.width -= deltaX;
+        cropBox.height -= deltaY;
+        break;
+      case 'tr':
+        cropBox.y += deltaY;
+        cropBox.width += deltaX;
+        cropBox.height -= deltaY;
+        break;
+      case 'bl':
+        cropBox.x += deltaX;
+        cropBox.width -= deltaX;
+        cropBox.height += deltaY;
+        break;
+      case 'br':
+        cropBox.width += deltaX;
+        cropBox.height += deltaY;
+        break;
+    }
+    
+    // 限制最小尺寸
+    cropBox.width = Math.max(50, cropBox.width);
+    cropBox.height = Math.max(30, cropBox.height);
+  }
+
+  // 移除監護人身分證圖片
+  removeGuardianIdCardImage(side: 'front' | 'back') {
+    this.guardianIdCardImages[side] = {
+      preview: null,
+      file: null,
+      scale: 1,
+      rotation: 0,
+      cropping: false,
+      cropBox: { x: 50, y: 50, width: 200, height: 120 }
+    };
+    
+    // 清除表單值
+    this.applicationForm.get(`guardianIdCard${side.charAt(0).toUpperCase() + side.slice(1)}`)?.setValue('');
+  }
+
+  // 監護人身分證滾輪縮放
+  onGuardianImageWheel(event: WheelEvent, side: 'front' | 'back') {
+    event.preventDefault();
+    const delta = event.deltaY > 0 ? -0.1 : 0.1;
+    this.zoomGuardianImage(side, delta);
+  }
+
+  // === 戶口謄本圖片處理方法 ===
+  
+  onHouseholdImageSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // 檢查檔案類型
+    if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
+      alert('請選擇 JPG 或 PNG 格式的圖片檔案');
+      return;
+    }
+
+    // 檢查檔案大小（限制 10MB）
+    if (file.size > 10 * 1024 * 1024) {
+      alert('圖片檔案太大，請選擇小於 10MB 的檔案');
+      return;
+    }
+
+    // 讀取檔案並建立預覽
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.householdImages.household = {
+        preview: e.target?.result as string,
+        file: file,
+        scale: 1,
+        rotation: 0,
+        cropping: false,
+        cropBox: { x: 50, y: 50, width: 200, height: 120 }
+      };
+      
+      // 更新表單驗證狀態
+      this.applicationForm.get('householdRecord')?.setValue(file.name);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // 戶口謄本拖拽處理
+  onHouseholdDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    (event.currentTarget as HTMLElement)?.classList.remove('drag-over');
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const mockEvent = { target: { files: [files[0]] } };
+      this.onHouseholdImageSelected(mockEvent);
+    }
+  }
+
+  // 戶口謄本旋轉
+  rotateHouseholdImage() {
+    this.householdImages.household.rotation = (this.householdImages.household.rotation + 90) % 360;
+  }
+
+  // 戶口謄本縮放
+  zoomHouseholdImage(delta: number) {
+    const newScale = Math.max(0.5, Math.min(3, this.householdImages.household.scale + delta));
+    this.householdImages.household.scale = newScale;
+  }
+
+  onHouseholdZoomChange(event: any) {
+    this.householdImages.household.scale = parseFloat(event.target.value);
+  }
+
+  // 戶口謄本圖片拖拽
+  onHouseholdImageMouseDown(event: MouseEvent) {
+    event.preventDefault();
+    
+    if (this.householdImages.household.cropping) return;
+    
+    this.householdImages.household.isDragging = true;
+    this.householdImages.household.dragStart = { x: event.clientX, y: event.clientY };
+  }
+
+  onHouseholdImageMouseMove(event: MouseEvent) {
+    const image = this.householdImages.household;
+    
+    if (image.isDragging && image.dragStart) {
+      const deltaX = event.clientX - image.dragStart.x;
+      const deltaY = event.clientY - image.dragStart.y;
+      
+      image.offsetX = (image.offsetX || 0) + deltaX;
+      image.offsetY = (image.offsetY || 0) + deltaY;
+      
+      image.dragStart = { x: event.clientX, y: event.clientY };
+    }
+    
+    if (image.isCropDragging && image.cropDragStart && image.cropHandle) {
+      const deltaX = event.clientX - image.cropDragStart.x;
+      const deltaY = event.clientY - image.cropDragStart.y;
+      
+      this.updateHouseholdCropBox(image.cropHandle, deltaX, deltaY);
+      image.cropDragStart = { x: event.clientX, y: event.clientY };
+    }
+  }
+
+  onHouseholdImageMouseUp(event: MouseEvent) {
+    this.householdImages.household.isDragging = false;
+    this.householdImages.household.isCropDragging = false;
+    this.householdImages.household.cropHandle = undefined;
+  }
+
+  // 戶口謄本裁切功能
+  cropHouseholdImage() {
+    this.householdImages.household.cropping = true;
+    // 儲存原始預覽圖片
+    this.householdImages.household.originalPreview = this.householdImages.household.preview || undefined;
+  }
+
+  cancelHouseholdCrop() {
+    this.householdImages.household.cropping = false;
+    if (this.householdImages.household.originalPreview) {
+      this.householdImages.household.preview = this.householdImages.household.originalPreview;
+      this.householdImages.household.originalPreview = undefined;
+    }
+  }
+
+  confirmHouseholdCrop() {
+    const image = this.householdImages.household;
+    if (!image.preview) return;
+
+    // 建立 canvas 進行裁切
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const img = new Image();
+    img.onload = () => {
+      const cropBox = image.cropBox;
+      canvas.width = cropBox.width;
+      canvas.height = cropBox.height;
+
+      // 應用旋轉和縮放
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate((image.rotation * Math.PI) / 180);
+      ctx.scale(image.scale, image.scale);
+      
+      ctx.drawImage(
+        img,
+        cropBox.x - canvas.width / 2,
+        cropBox.y - canvas.height / 2,
+        cropBox.width,
+        cropBox.height,
+        -cropBox.width / 2,
+        -cropBox.height / 2,
+        cropBox.width,
+        cropBox.height
+      );
+      ctx.restore();
+
+      // 更新預覽圖片
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const croppedFile = new File([blob], image.file?.name || 'cropped-household.jpg', { type: 'image/jpeg' });
+          image.file = croppedFile;
+          image.preview = canvas.toDataURL();
+          image.cropping = false;
+          image.originalPreview = undefined;
+        }
+      }, 'image/jpeg', 0.9);
+    };
+    
+    img.src = image.originalPreview || image.preview;
+  }
+
+  // 戶口謄本裁切控制點拖拽
+  onHouseholdCropHandleMouseDown(event: MouseEvent, handle: string) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.householdImages.household.isCropDragging = true;
+    this.householdImages.household.cropDragStart = { x: event.clientX, y: event.clientY };
+    this.householdImages.household.cropHandle = handle;
+  }
+
+  // 更新戶口謄本裁切框
+  private updateHouseholdCropBox(handle: string, deltaX: number, deltaY: number) {
+    const cropBox = this.householdImages.household.cropBox;
+    
+    switch (handle) {
+      case 'tl':
+        cropBox.x += deltaX;
+        cropBox.y += deltaY;
+        cropBox.width -= deltaX;
+        cropBox.height -= deltaY;
+        break;
+      case 'tr':
+        cropBox.y += deltaY;
+        cropBox.width += deltaX;
+        cropBox.height -= deltaY;
+        break;
+      case 'bl':
+        cropBox.x += deltaX;
+        cropBox.width -= deltaX;
+        cropBox.height += deltaY;
+        break;
+      case 'br':
+        cropBox.width += deltaX;
+        cropBox.height += deltaY;
+        break;
+    }
+    
+    // 限制最小尺寸
+    cropBox.width = Math.max(50, cropBox.width);
+    cropBox.height = Math.max(30, cropBox.height);
+  }
+
+  // 移除戶口謄本圖片
+  removeHouseholdImage() {
+    this.householdImages.household = {
+      preview: null,
+      file: null,
+      scale: 1,
+      rotation: 0,
+      cropping: false,
+      cropBox: { x: 50, y: 50, width: 200, height: 120 }
+    };
+    
+    // 清除表單值
+    this.applicationForm.get('householdRecord')?.setValue('');
+  }
+
+  // 戶口謄本滾輪縮放
+  onHouseholdImageWheel(event: WheelEvent) {
+    event.preventDefault();
+    const delta = event.deltaY > 0 ? -0.1 : 0.1;
+    this.zoomHouseholdImage(delta);
+  }
+
+  // === 報案單圖片處理方法 ===
+  
+  onPoliceReportImageSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // 檢查檔案類型
+    if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
+      alert('請選擇 JPG 或 PNG 格式的圖片檔案');
+      return;
+    }
+
+    // 檢查檔案大小（限制 10MB）
+    if (file.size > 10 * 1024 * 1024) {
+      alert('圖片檔案太大，請選擇小於 10MB 的檔案');
+      return;
+    }
+
+    // 讀取檔案並建立預覽
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.policeReportImages.report = {
+        preview: e.target?.result as string,
+        file: file,
+        scale: 1,
+        rotation: 0,
+        cropping: false,
+        cropBox: { x: 50, y: 50, width: 200, height: 120 }
+      };
+      
+      // 更新表單驗證狀態
+      this.applicationForm.get('policeReport')?.setValue(file.name);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // 報案單拖拽處理
+  onPoliceReportDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    (event.currentTarget as HTMLElement)?.classList.remove('drag-over');
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const mockEvent = { target: { files: [files[0]] } };
+      this.onPoliceReportImageSelected(mockEvent);
+    }
+  }
+
+  // 報案單旋轉
+  rotatePoliceReportImage() {
+    this.policeReportImages.report.rotation = (this.policeReportImages.report.rotation + 90) % 360;
+  }
+
+  // 報案單縮放
+  zoomPoliceReportImage(delta: number) {
+    const newScale = Math.max(0.5, Math.min(3, this.policeReportImages.report.scale + delta));
+    this.policeReportImages.report.scale = newScale;
+  }
+
+  onPoliceReportZoomChange(event: any) {
+    this.policeReportImages.report.scale = parseFloat(event.target.value);
+  }
+
+  // 報案單圖片拖拽
+  onPoliceReportImageMouseDown(event: MouseEvent) {
+    event.preventDefault();
+    
+    if (this.policeReportImages.report.cropping) return;
+    
+    this.policeReportImages.report.isDragging = true;
+    this.policeReportImages.report.dragStart = { x: event.clientX, y: event.clientY };
+  }
+
+  onPoliceReportImageMouseMove(event: MouseEvent) {
+    const image = this.policeReportImages.report;
+    
+    if (image.isDragging && image.dragStart) {
+      const deltaX = event.clientX - image.dragStart.x;
+      const deltaY = event.clientY - image.dragStart.y;
+      
+      image.offsetX = (image.offsetX || 0) + deltaX;
+      image.offsetY = (image.offsetY || 0) + deltaY;
+      
+      image.dragStart = { x: event.clientX, y: event.clientY };
+    }
+    
+    if (image.isCropDragging && image.cropDragStart && image.cropHandle) {
+      const deltaX = event.clientX - image.cropDragStart.x;
+      const deltaY = event.clientY - image.cropDragStart.y;
+      
+      this.updatePoliceReportCropBox(image.cropHandle, deltaX, deltaY);
+      image.cropDragStart = { x: event.clientX, y: event.clientY };
+    }
+  }
+
+  onPoliceReportImageMouseUp(event: MouseEvent) {
+    this.policeReportImages.report.isDragging = false;
+    this.policeReportImages.report.isCropDragging = false;
+    this.policeReportImages.report.cropHandle = undefined;
+  }
+
+  // 報案單裁切功能
+  cropPoliceReportImage() {
+    this.policeReportImages.report.cropping = true;
+    // 儲存原始預覽圖片
+    this.policeReportImages.report.originalPreview = this.policeReportImages.report.preview || undefined;
+  }
+
+  cancelPoliceReportCrop() {
+    this.policeReportImages.report.cropping = false;
+    if (this.policeReportImages.report.originalPreview) {
+      this.policeReportImages.report.preview = this.policeReportImages.report.originalPreview;
+      this.policeReportImages.report.originalPreview = undefined;
+    }
+  }
+
+  confirmPoliceReportCrop() {
+    const image = this.policeReportImages.report;
+    if (!image.preview) return;
+
+    // 建立 canvas 進行裁切
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const img = new Image();
+    img.onload = () => {
+      const cropBox = image.cropBox;
+      canvas.width = cropBox.width;
+      canvas.height = cropBox.height;
+
+      // 應用旋轉和縮放
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate((image.rotation * Math.PI) / 180);
+      ctx.scale(image.scale, image.scale);
+      
+      ctx.drawImage(
+        img,
+        cropBox.x - canvas.width / 2,
+        cropBox.y - canvas.height / 2,
+        cropBox.width,
+        cropBox.height,
+        -cropBox.width / 2,
+        -cropBox.height / 2,
+        cropBox.width,
+        cropBox.height
+      );
+      ctx.restore();
+
+      // 更新預覽圖片
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const croppedFile = new File([blob], image.file?.name || 'cropped-police-report.jpg', { type: 'image/jpeg' });
+          image.file = croppedFile;
+          image.preview = canvas.toDataURL();
+          image.cropping = false;
+          image.originalPreview = undefined;
+        }
+      }, 'image/jpeg', 0.9);
+    };
+    
+    img.src = image.originalPreview || image.preview;
+  }
+
+  // 報案單裁切控制點拖拽
+  onPoliceReportCropHandleMouseDown(event: MouseEvent, handle: string) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.policeReportImages.report.isCropDragging = true;
+    this.policeReportImages.report.cropDragStart = { x: event.clientX, y: event.clientY };
+    this.policeReportImages.report.cropHandle = handle;
+  }
+
+  // 更新報案單裁切框
+  private updatePoliceReportCropBox(handle: string, deltaX: number, deltaY: number) {
+    const cropBox = this.policeReportImages.report.cropBox;
+    
+    switch (handle) {
+      case 'tl':
+        cropBox.x += deltaX;
+        cropBox.y += deltaY;
+        cropBox.width -= deltaX;
+        cropBox.height -= deltaY;
+        break;
+      case 'tr':
+        cropBox.y += deltaY;
+        cropBox.width += deltaX;
+        cropBox.height -= deltaY;
+        break;
+      case 'bl':
+        cropBox.x += deltaX;
+        cropBox.width -= deltaX;
+        cropBox.height += deltaY;
+        break;
+      case 'br':
+        cropBox.width += deltaX;
+        cropBox.height += deltaY;
+        break;
+    }
+    
+    // 限制最小尺寸
+    cropBox.width = Math.max(50, cropBox.width);
+    cropBox.height = Math.max(30, cropBox.height);
+  }
+
+  // 移除報案單圖片
+  removePoliceReportImage() {
+    this.policeReportImages.report = {
+      preview: null,
+      file: null,
+      scale: 1,
+      rotation: 0,
+      cropping: false,
+      cropBox: { x: 50, y: 50, width: 200, height: 120 }
+    };
+    
+    // 清除表單值
+    this.applicationForm.get('policeReport')?.setValue('');
+  }
+
+  // 報案單滾輪縮放
+  onPoliceReportImageWheel(event: WheelEvent) {
+    event.preventDefault();
+    const delta = event.deltaY > 0 ? -0.1 : 0.1;
+    this.zoomPoliceReportImage(delta);
+  }
+
+  // === 舊台胞證影本/切結書圖片處理方法 ===
+  
+  onOldPassportDocumentImageSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // 檢查檔案類型
+    if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
+      alert('請選擇 JPG 或 PNG 格式的圖片檔案');
+      return;
+    }
+
+    // 檢查檔案大小（限制 10MB）
+    if (file.size > 10 * 1024 * 1024) {
+      alert('圖片檔案太大，請選擇小於 10MB 的檔案');
+      return;
+    }
+
+    // 讀取檔案並建立預覽
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.oldPassportImages.document = {
+        preview: e.target?.result as string,
+        file: file,
+        scale: 1,
+        rotation: 0,
+        cropping: false,
+        cropBox: { x: 50, y: 50, width: 200, height: 120 }
+      };
+      
+      // 更新表單驗證狀態
+      this.applicationForm.get('oldPassportDocument')?.setValue(file.name);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // 舊台胞證影本/切結書拖拽處理
+  onOldPassportDocumentDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    (event.currentTarget as HTMLElement)?.classList.remove('drag-over');
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const mockEvent = { target: { files: [files[0]] } };
+      this.onOldPassportDocumentImageSelected(mockEvent);
+    }
+  }
+
+  // 舊台胞證影本/切結書旋轉
+  rotateOldPassportDocumentImage() {
+    this.oldPassportImages.document.rotation = (this.oldPassportImages.document.rotation + 90) % 360;
+  }
+
+  // 舊台胞證影本/切結書縮放
+  zoomOldPassportDocumentImage(delta: number) {
+    const newScale = Math.max(0.5, Math.min(3, this.oldPassportImages.document.scale + delta));
+    this.oldPassportImages.document.scale = newScale;
+  }
+
+  onOldPassportDocumentZoomChange(event: any) {
+    this.oldPassportImages.document.scale = parseFloat(event.target.value);
+  }
+
+  // 舊台胞證影本/切結書圖片拖拽
+  onOldPassportDocumentImageMouseDown(event: MouseEvent) {
+    event.preventDefault();
+    
+    if (this.oldPassportImages.document.cropping) return;
+    
+    this.oldPassportImages.document.isDragging = true;
+    this.oldPassportImages.document.dragStart = { x: event.clientX, y: event.clientY };
+  }
+
+  onOldPassportDocumentImageMouseMove(event: MouseEvent) {
+    const image = this.oldPassportImages.document;
+    
+    if (image.isDragging && image.dragStart) {
+      const deltaX = event.clientX - image.dragStart.x;
+      const deltaY = event.clientY - image.dragStart.y;
+      
+      image.offsetX = (image.offsetX || 0) + deltaX;
+      image.offsetY = (image.offsetY || 0) + deltaY;
+      
+      image.dragStart = { x: event.clientX, y: event.clientY };
+    }
+    
+    if (image.isCropDragging && image.cropDragStart && image.cropHandle) {
+      const deltaX = event.clientX - image.cropDragStart.x;
+      const deltaY = event.clientY - image.cropDragStart.y;
+      
+      this.updateOldPassportDocumentCropBox(image.cropHandle, deltaX, deltaY);
+      image.cropDragStart = { x: event.clientX, y: event.clientY };
+    }
+  }
+
+  onOldPassportDocumentImageMouseUp(event: MouseEvent) {
+    this.oldPassportImages.document.isDragging = false;
+    this.oldPassportImages.document.isCropDragging = false;
+    this.oldPassportImages.document.cropHandle = undefined;
+  }
+
+  // 舊台胞證影本/切結書裁切功能
+  cropOldPassportDocumentImage() {
+    this.oldPassportImages.document.cropping = true;
+    // 儲存原始預覽圖片
+    this.oldPassportImages.document.originalPreview = this.oldPassportImages.document.preview || undefined;
+  }
+
+  cancelOldPassportDocumentCrop() {
+    this.oldPassportImages.document.cropping = false;
+    if (this.oldPassportImages.document.originalPreview) {
+      this.oldPassportImages.document.preview = this.oldPassportImages.document.originalPreview;
+      this.oldPassportImages.document.originalPreview = undefined;
+    }
+  }
+
+  confirmOldPassportDocumentCrop() {
+    const image = this.oldPassportImages.document;
+    if (!image.preview) return;
+
+    // 建立 canvas 進行裁切
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const img = new Image();
+    img.onload = () => {
+      const cropBox = image.cropBox;
+      canvas.width = cropBox.width;
+      canvas.height = cropBox.height;
+
+      // 應用旋轉和縮放
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate((image.rotation * Math.PI) / 180);
+      ctx.scale(image.scale, image.scale);
+      
+      ctx.drawImage(
+        img,
+        cropBox.x - canvas.width / 2,
+        cropBox.y - canvas.height / 2,
+        cropBox.width,
+        cropBox.height,
+        -cropBox.width / 2,
+        -cropBox.height / 2,
+        cropBox.width,
+        cropBox.height
+      );
+      ctx.restore();
+
+      // 更新預覽圖片
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const croppedFile = new File([blob], image.file?.name || 'cropped-old-passport.jpg', { type: 'image/jpeg' });
+          image.file = croppedFile;
+          image.preview = canvas.toDataURL();
+          image.cropping = false;
+          image.originalPreview = undefined;
+        }
+      }, 'image/jpeg', 0.9);
+    };
+    
+    img.src = image.originalPreview || image.preview;
+  }
+
+  // 舊台胞證影本/切結書裁切控制點拖拽
+  onOldPassportDocumentCropHandleMouseDown(event: MouseEvent, handle: string) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.oldPassportImages.document.isCropDragging = true;
+    this.oldPassportImages.document.cropDragStart = { x: event.clientX, y: event.clientY };
+    this.oldPassportImages.document.cropHandle = handle;
+  }
+
+  // 更新舊台胞證影本/切結書裁切框
+  private updateOldPassportDocumentCropBox(handle: string, deltaX: number, deltaY: number) {
+    const cropBox = this.oldPassportImages.document.cropBox;
+    
+    switch (handle) {
+      case 'tl':
+        cropBox.x += deltaX;
+        cropBox.y += deltaY;
+        cropBox.width -= deltaX;
+        cropBox.height -= deltaY;
+        break;
+      case 'tr':
+        cropBox.y += deltaY;
+        cropBox.width += deltaX;
+        cropBox.height -= deltaY;
+        break;
+      case 'bl':
+        cropBox.x += deltaX;
+        cropBox.width -= deltaX;
+        cropBox.height += deltaY;
+        break;
+      case 'br':
+        cropBox.width += deltaX;
+        cropBox.height += deltaY;
+        break;
+    }
+    
+    // 限制最小尺寸
+    cropBox.width = Math.max(50, cropBox.width);
+    cropBox.height = Math.max(30, cropBox.height);
+  }
+
+  // 移除舊台胞證影本/切結書圖片
+  removeOldPassportDocumentImage() {
+    this.oldPassportImages.document = {
+      preview: null,
+      file: null,
+      scale: 1,
+      rotation: 0,
+      cropping: false,
+      cropBox: { x: 50, y: 50, width: 200, height: 120 }
+    };
+    
+    // 清除表單值
+    this.applicationForm.get('oldPassportDocument')?.setValue('');
+  }
+
+  // 舊台胞證影本/切結書滾輪縮放
+  onOldPassportDocumentImageWheel(event: WheelEvent) {
+    event.preventDefault();
+    const delta = event.deltaY > 0 ? -0.1 : 0.1;
+    this.zoomOldPassportDocumentImage(delta);
   }
 }

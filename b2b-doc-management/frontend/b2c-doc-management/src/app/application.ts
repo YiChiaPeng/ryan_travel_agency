@@ -18,7 +18,7 @@ export interface Individual {
   english_last_name: string;
   english_first_name: string;
   national_id: string;
-  gender: '男' | '女';
+  birth_date: string;
   passport_infomation_image?: string;
   id_card_front_image?: string;
   id_card_back_image?: string;
