@@ -12,7 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # 創建路由器
-router = APIRouter(prefix="/api", tags=["AI"])
+router = APIRouter(prefix="/api", tags=["AI / OCR / LLM"])
 
 # 請求模型
 class OCRRequest(BaseModel):

@@ -10,7 +10,8 @@ import pandas as pd
 import glob
 import time
 
-router = APIRouter(prefix="/api")
+# 舊版 API 路由，改掛載到 /api/v1 作為相容層
+router = APIRouter(prefix="/api/v1", tags=["舊版記錄/檔案"])
 
 
 @router.post('/upload')

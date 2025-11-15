@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from app.services.auth_service import AuthService
 from typing import Optional
 
-router = APIRouter(prefix="/auth")
+router = APIRouter(prefix="/auth", tags=["認證/帳號"])
 
 
 # Pydantic models for request validation

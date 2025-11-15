@@ -13,8 +13,8 @@ from app.middleware.auth import get_current_user
 from app.services.individual_service import IndividualService
 from app.services.application_service import ApplicationService
 
-# 創建路由器
-router = APIRouter(prefix="/api/v2")
+# 創建路由器（統一掛載在 /api）
+router = APIRouter(prefix="/api", tags=["申請案件與個人資料"])
 
 # === Pydantic 模型定義 ===
 
