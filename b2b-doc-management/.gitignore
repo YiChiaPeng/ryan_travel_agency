@@ -1,3 +1,80 @@
 
+########################################
+# OS / Editor artifacts
+########################################
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.history/
+*.code-workspace
+*.swp
+*.swo
 
-**.pyc
+########################################
+# Environment & secrets
+########################################
+.env
+.env.*
+!.env.example
+*.local
+*.local.*
+
+########################################
+# Logs
+########################################
+logs/
+log/
+*.log
+
+########################################
+# Python (backend)
+########################################
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+########################################
+# Node / Angular (frontend)
+########################################
+node_modules/
+dist/
+.angular/
+.angular/cache/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+########################################
+# Docker / Compose (local overrides)
+########################################
+docker-compose.override.yml
+*.local.yml
+
+########################################
+# Database (if bind-mounted locally)
+########################################
+db_data/

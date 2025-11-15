@@ -117,7 +117,7 @@ export class Dashboard implements OnInit {
   }
 
   getRoleText(role: string): string {
-    return role === 'reviewer' ? '審核者' : '一般使用者';
+    return role === 'admin' ? '審核者' : '一般使用者';
   }
 
   // 使用者選單控制

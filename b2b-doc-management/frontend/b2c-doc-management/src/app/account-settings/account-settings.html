@@ -9,7 +9,7 @@
     <h1 class="settings-title">帳號設定</h1>
     <div class="user-badge">
       <span class="user-name">{{ currentUser?.name }}</span>
-      <span class="user-role">{{ currentUser?.role === 'reviewer' ? '審核者' : '一般使用者' }}</span>
+      <span class="user-role">{{ currentUser?.role === 'admin' ? '審核者' : '一般使用者' }}</span>
     </div>
   </div>
 
@@ -151,7 +151,7 @@
       <div class="info-grid">
         <div class="info-item">
           <div class="info-label">帳號類型</div>
-          <div class="info-value">{{ currentUser?.role === 'user' ? '一般使用者' : '網站管理者' }}</div>
+          <div class="info-value">{{ currentUser?.role === 'admin' ? '網站管理者': '一般使用者'}}</div>
         </div>
         <div class="info-item">
           <div class="info-label">註冊公司</div>

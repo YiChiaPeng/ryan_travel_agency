@@ -36,6 +36,8 @@ services:
     volumes:
       # Mount into the package directory so the container's /app entrypoint isn't overwritten
       - ./backend/app:/app/app
+    restart: always
+
 
   smtp:
     image: "mailhog/mailhog"
