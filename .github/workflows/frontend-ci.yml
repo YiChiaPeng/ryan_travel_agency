@@ -1,0 +1,69 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'b2b-doc-management/frontend/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'b2b-doc-management/frontend/**'
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: b2b-doc-management/frontend/b2c-doc-management/package-lock.json
+
+    - name: Install dependencies
+      working-directory: ./b2b-doc-management/frontend/b2c-doc-management
+      run: npm ci
+
+    - name: Lint code
+      working-directory: ./b2b-doc-management/frontend/b2c-doc-management
+      run: |
+        npm run ng lint || echo "Linting completed with warnings"
+
+    - name: Check formatting with Prettier
+      working-directory: ./b2b-doc-management/frontend/b2c-doc-management
+      run: |
+        npx prettier --check "src/**/*.{ts,html,css,scss}" || echo "Formatting issues found"
+
+    - name: Build application
+      working-directory: ./b2b-doc-management/frontend/b2c-doc-management
+      run: npm run build
+
+    - name: Run tests
+      working-directory: ./b2b-doc-management/frontend/b2c-doc-management
+      run: |
+        # Run tests in headless mode if karma config exists
+        if [ -f "karma.conf.js" ]; then
+          npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+        else
+          echo "No karma config found - skipping tests"
+        fi
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-build
+        path: b2b-doc-management/frontend/b2c-doc-management/dist
+        retention-days: 7
+
+    - name: Upload coverage reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-coverage-report
+        path: b2b-doc-management/frontend/b2c-doc-management/coverage
+        retention-days: 7

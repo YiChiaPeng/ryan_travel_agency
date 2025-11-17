@@ -5,7 +5,21 @@ from app.routes_ai import router as ai_router  # 啟用 AI 功能路由
 from app.services.auth import router as auth_router
 from app.utils.db import init_db
 
-app = FastAPI()
+app = FastAPI(
+    title="Ryan Travel Agency - B2B Document Management API",
+    description="API for B2B document upload and review management system",
+    version="1.0.0",
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
+    contact={
+        "name": "Ryan Travel Agency",
+        "url": "https://github.com/YiChiaPeng/ryan_travel_agency",
+    },
+    license_info={
+        "name": "MIT",
+    }
+)
 
 # CORS configuration
 app.add_middleware(
