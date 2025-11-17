@@ -70,4 +70,37 @@ export class ApiService {
       new_password: newPassword
     });
   }
+
+  // === Admin: Users CRUD ===
+  private authHeaders(token: string): HttpHeaders {
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
+  getUsers(token: string, page: number = 1, limit: number = 50): Observable<any> {
+    const headers = this.authHeaders(token);
+    return this.http.get(`${this.baseUrl}/api/admin/users`, { headers, params: { page, limit } as any });
+  }
+
+  getUser(token: string, userId: number): Observable<any> {
+    const headers = this.authHeaders(token);
+    return this.http.get(`${this.baseUrl}/api/admin/users/${userId}`, { headers });
+  }
+
+  createUser(token: string, payload: { username: string; password: string; company_name?: string; email?: string; role?: string; }): Observable<any> {
+    const headers = this.authHeaders(token);
+    return this.http.post(`${this.baseUrl}/api/admin/users`, payload, { headers });
+  }
+
+  updateUser(token: string, userId: number, payload: Partial<{ username: string; password: string; company_name: string; email: string; role: string; }>): Observable<any> {
+    const headers = this.authHeaders(token);
+    return this.http.put(`${this.baseUrl}/api/admin/users/${userId}`, payload, { headers });
+  }
+
+  deleteUser(token: string, userId: number): Observable<any> {
+    const headers = this.authHeaders(token);
+    return this.http.delete(`${this.baseUrl}/api/admin/users/${userId}`, { headers });
+  }
 }

@@ -9,7 +9,8 @@ from typing import Optional, Dict, Any, List
 import json
 import base64
 from app.models import User
-from app.middleware.auth import get_current_user
+from app.middleware.auth import get_current_user, get_current_admin
+from app.services.user_service import UserService
 from app.services.individual_service import IndividualService
 from app.services.application_service import ApplicationService
 
@@ -343,3 +344,46 @@ def upload_image(file: UploadFile = File(...), current_user: User = Depends(get_
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'圖片上傳失敗: {str(e)}')
+
+# === 管理員：使用者管理 ===
+
+@router.get('/admin/users', tags=["管理員/使用者"])
+def admin_list_users(page: int = 1, limit: int = 50, current_admin: User = Depends(get_current_admin)):
+    result = UserService.list_users(page, limit)
+    if result.get('success'):
+        return JSONResponse(result)
+    raise HTTPException(status_code=500, detail=result.get('error', 'unknown error'))
+
+
+@router.get('/admin/users/{user_id}', tags=["管理員/使用者"])
+def admin_get_user(user_id: int, current_admin: User = Depends(get_current_admin)):
+    data = UserService.get_user(user_id)
+    if data:
+        return JSONResponse({'success': True, 'data': data})
+    raise HTTPException(status_code=404, detail='找不到使用者')
+
+
+@router.post('/admin/users', tags=["管理員/使用者"])
+def admin_create_user(payload: dict, current_admin: User = Depends(get_current_admin)):
+    result = UserService.create_user(payload)
+    if result.get('success'):
+        return JSONResponse(result, status_code=201)
+    raise HTTPException(status_code=400, detail=result.get('error', '建立使用者失敗'))
+
+
+@router.put('/admin/users/{user_id}', tags=["管理員/使用者"])
+def admin_update_user(user_id: int, payload: dict, current_admin: User = Depends(get_current_admin)):
+    result = UserService.update_user(user_id, payload)
+    if result.get('success'):
+        return JSONResponse(result)
+    status = 400 if '找不到' not in result.get('error', '') else 404
+    raise HTTPException(status_code=status, detail=result.get('error', '更新使用者失敗'))
+
+
+@router.delete('/admin/users/{user_id}', tags=["管理員/使用者"])
+def admin_delete_user(user_id: int, current_admin: User = Depends(get_current_admin)):
+    result = UserService.delete_user(user_id)
+    if result.get('success'):
+        return JSONResponse(result)
+    status = 400 if '找不到' not in result.get('error', '') else 404
+    raise HTTPException(status_code=status, detail=result.get('error', '刪除使用者失敗'))

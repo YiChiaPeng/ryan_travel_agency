@@ -4,6 +4,7 @@ import { Dashboard } from './dashboard/dashboard';
 import { ApplicationForm } from './application-form/application-form';
 import { ApplicationHistory } from './application-history/application-history';
 import { AccountSettings } from './account-settings/account-settings';
+import { UserManagement } from './user-management/user-management';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -13,5 +14,6 @@ export const routes: Routes = [
   { path: 'application-form/:id', component: ApplicationForm },
   { path: 'application-history', component: ApplicationHistory },
   { path: 'account-settings', component: AccountSettings },
+  { path: 'admin/users', component: UserManagement },
   { path: '**', redirectTo: '/login' }
 ];

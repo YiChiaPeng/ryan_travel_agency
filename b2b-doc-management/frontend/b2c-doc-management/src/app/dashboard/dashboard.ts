@@ -131,7 +131,11 @@ export class Dashboard implements OnInit {
     this.router.navigate(['/account-settings']);
   }
 
-  // 點擊外部關閉選單（可在 HTML 中使用）
+  // 導航到使用者管理（僅 admin 可見）
+  navigateToUserManagement() {
+    this.isUserMenuOpen = false;
+    this.router.navigate(['/admin/users']);
+  }  // 點擊外部關閉選單（可在 HTML 中使用）
   closeUserMenu() {
     this.isUserMenuOpen = false;
   }
