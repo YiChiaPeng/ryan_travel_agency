@@ -1,0 +1,87 @@
+name: API Specification Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'b2b-doc-management/backend/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'b2b-doc-management/backend/**'
+
+jobs:
+  generate-and-validate-spec:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      working-directory: ./b2b-doc-management/backend
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Generate OpenAPI Specification
+      working-directory: ./b2b-doc-management/backend
+      run: |
+        python -c "
+        from app.main import app
+        import json
+        
+        openapi_schema = app.openapi()
+        
+        with open('../../openapi.json', 'w', encoding='utf-8') as f:
+            json.dump(openapi_schema, f, indent=2, ensure_ascii=False)
+        
+        print('OpenAPI specification generated successfully')
+        print(f'API Version: {openapi_schema.get(\"info\", {}).get(\"version\")}')
+        print(f'Total endpoints: {len(openapi_schema.get(\"paths\", {}))}')
+        "
+
+    - name: Validate OpenAPI Specification
+      run: |
+        npm install -g @apidevtools/swagger-cli
+        swagger-cli validate openapi.json
+
+    - name: Upload OpenAPI Specification
+      uses: actions/upload-artifact@v4
+      with:
+        name: openapi-specification
+        path: openapi.json
+        retention-days: 30
+
+    - name: Comment PR with API changes
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const spec = JSON.parse(fs.readFileSync('openapi.json', 'utf8'));
+          const endpoints = Object.keys(spec.paths || {}).length;
+          
+          const comment = `### 🔍 API Specification Generated
+          
+          **API Version:** ${spec.info.version}
+          **Total Endpoints:** ${endpoints}
+          **Documentation:** Available at \`/api/docs\` when running the server
+          
+          The OpenAPI specification has been validated successfully! ✅`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });

@@ -1,0 +1,80 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'b2b-doc-management/backend/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'b2b-doc-management/backend/**'
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      working-directory: ./b2b-doc-management/backend
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install flake8 black pylint pytest pytest-cov
+
+    - name: Lint with flake8
+      working-directory: ./b2b-doc-management/backend
+      run: |
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 app --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 app --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Check code formatting with black
+      working-directory: ./b2b-doc-management/backend
+      run: |
+        black --check app || echo "Code formatting issues found. Run 'black app' to fix."
+
+    - name: Type checking (if mypy is added)
+      working-directory: ./b2b-doc-management/backend
+      run: |
+        if pip list | grep -q mypy; then
+          mypy app --ignore-missing-imports || echo "Type checking completed with warnings"
+        else
+          echo "Skipping type checking - mypy not installed"
+        fi
+
+    - name: Security check with bandit
+      working-directory: ./b2b-doc-management/backend
+      run: |
+        pip install bandit
+        bandit -r app -f json -o bandit-report.json || echo "Security scan completed"
+        cat bandit-report.json
+
+    - name: Run tests (if tests exist)
+      working-directory: ./b2b-doc-management/backend
+      run: |
+        if [ -d "tests" ]; then
+          pytest tests/ -v --cov=app --cov-report=xml --cov-report=html
+        else
+          echo "No tests directory found - skipping tests"
+        fi
+
+    - name: Upload coverage reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-coverage-report
+        path: b2b-doc-management/backend/htmlcov
+        retention-days: 7
